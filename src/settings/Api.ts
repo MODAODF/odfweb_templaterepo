@@ -32,6 +32,7 @@ export interface ManageRuleProps {
 export interface Folder {
 	id: number;
 	mount_point: string;
+	api_server: string;
 	quota: number;
 	size: number;
 	groups: { [group: string]: number };
@@ -139,4 +140,33 @@ export class Api {
 			mountpoint
 		});
 	}
+
+	renameAPIServer(folderId: number, apiserver: string): Thenable<void> {
+		return $.post(this.getUrl(`folders/${folderId}/apiserver`), {
+			apiserver
+		});
+	}
+
+	aclMappingSearch(folderId: number, search: string): Thenable<{ groups: OCSGroup[], users: OCSUser[] }> {
+		return $.getJSON(this.getUrl(`folders/${folderId}/search?format=json&search=${search}`))
+			.then((data: OCSResult<{ groups: OCSGroup[]; users: OCSUser[]; }>) => {
+				return {
+					groups: data.ocs.data.groups.map((item) => {
+						return {
+							type: 'group',
+							id: item.gid,
+							displayname: item.displayname
+						}
+					}),
+					users: Object.values(data.ocs.data.users).map((item) => {
+						return {
+							type: 'user',
+							id: item.uid,
+							displayname: item.displayname
+						}
+					})
+				}
+			});
+	}
+
 }

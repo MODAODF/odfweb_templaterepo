@@ -67,5 +67,35 @@ return ['routes' => [
 		'name' => 'Delegation#getAllGroups',
 		'url' => 'delegation/groups',
 		'verb' => 'GET'
+	],
+	[
+		'name' => 'Folder#setManageACL',
+		'url' => '/folders/{id}/manageACL',
+		'verb' => 'POST'
+	],
+	[
+		'name' => 'Folder#setQuota',
+		'url' => '/folders/{id}/quota',
+		'verb' => 'POST'
+	],
+	[
+		'name' => 'Folder#setACL',
+		'url' => '/folders/{id}/acl',
+		'verb' => 'POST'
+	],
+	[
+		'name' => 'Folder#renameFolder',
+		'url' => '/folders/{id}/mountpoint',
+		'verb' => 'POST'
+	],
+	[
+		'name' => 'Folder#aclMappingSearch',
+		'url' => '/folders/{id}/search',
+		'verb' => 'GET'
+	],
+	[
+		'name' => 'Folder#setAPIServer',
+		'url' => '/folders/{id}/apiserver',
+		'verb' => 'POST'
 	]
 ]];

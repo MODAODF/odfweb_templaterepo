@@ -34,6 +34,11 @@ class Version102020Date20180806161449 extends SimpleMigrationStep {
 				'length' => 6,
 				'default' => -3,
 			]);
+			$table->addColumn('api_server', 'string', [
+				'notnull' => false,
+				'length'  => 128,
+				'default' => "127.0.0.1"
+			]);
 			$table->setPrimaryKey(['folder_id']);
 		}
 

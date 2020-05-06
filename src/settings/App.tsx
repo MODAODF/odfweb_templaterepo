@@ -29,6 +29,7 @@ export interface AppState {
 	editingGroup: number;
 	editingUser: number;
 	editingMountPoint: number;
+	editingAPIServer: number;
 	renameMountPoint: string;
 	filter: string;
 	sort: SortKey;
@@ -46,6 +47,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 		editingGroup: 0,
 		editingUser: 0,
 		editingMountPoint: 0,
+		editingAPIServer: 0,
 		renameMountPoint: '',
 		filter: '',
 		sort: 'mount_point',
@@ -76,6 +78,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 			const folders = this.state.folders;
 			folders.push({
 				mount_point: mountPoint,
+				api_server: "127.0.0.1",
 				groups: {},
 				users: {},
 				quota: -3,
@@ -162,6 +165,20 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 		this.setState({folders, editingMountPoint: 0});
 		this.api.renameFolder(folder.id, newName);
 	}
+
+    renameAPIServer(folder: Folder, newName: string) {
+		const folders = this.state.folders;
+		folder.api_server = newName;
+		this.setState({folders, editingAPIServer: 0});
+		this.api.renameAPIServer(folder.id, newName);
+	}
+
+    setAcl(folder: Folder, acl: boolean) {
+        const folders = this.state.folders;
+        folder.acl = acl;
+        this.setState({ folders });
+        this.api.setACL(folder.id, acl);
+    }
 
 	onSortClick = (sort: SortKey) => {
 		if (this.state.sort === sort) {
@@ -253,6 +270,45 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 									 size={folder.size}
 									 onChange={this.setQuota.bind(this, folder)}/>
 					</td>
+                    <td className="server">
+						{this.state.editingAPIServer === id ?
+							<SubmitInput
+								autoFocus={true}
+								onSubmitValue={this.renameAPIServer.bind(this, folder)}
+								onClick={event => {
+									event.stopPropagation();
+								}}
+								initialValue={folder.api_server}
+							/> :
+							<a
+								className="action-rename"
+								onClick={event => {
+									event.stopPropagation();
+									this.setState({editingAPIServer: id})
+								}}
+							>
+								{folder.api_server}
+							</a>
+						}
+					</td>
+                    {/*
+                    <td className="acl">
+                        <input id={`acl-${folder.id}`} type="checkbox" className="checkbox" checked={folder.acl} disabled={!App.supportACL()}
+                            title={
+                                App.supportACL() ?
+                                    t('templaterepo', 'Advanced permissions allows setting permissions on a per-file basis but comes with a performance overhead') :
+                                    t('templaterepo', 'Advanced permissions are only supported with Nextcloud 16 and up')}
+                            onChange={(event) => this.setAcl(folder, event.target.checked)}
+                        />
+                        {folder.acl &&
+                            <ManageAclSelect
+                                folder={folder}
+                                onChange={this.setManageACL.bind(this, folder)}
+                                onSearch={this.searchMappings.bind(this, folder)}
+                            />
+                        }
+                    </td>
+                    */}
 					<td className="remove">
 						<a className="icon icon-delete icon-visible"
 						   onClick={this.deleteFolder.bind(this, folder)}
@@ -288,6 +344,16 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 						<SortArrow name='quota' value={this.state.sort}
 								   direction={this.state.sortOrder}/>
 					</th>
+					<th>
+						{t('templaterepo', 'APIServer')}
+					</th>
+					{/*
+					<th onClick={() => this.onSortClick('acl')}>
+						{t('templaterepo', 'Advanced Permissions')}
+						<SortArrow name='acl' value={this.state.sort}
+							direction={this.state.sortOrder} />
+					</th>
+					*/}
 					<th/>
 				</tr>
 				</thead>
@@ -313,4 +379,79 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 			</table>
 		</div>;
 	}
+}
+
+interface ManageAclSelectProps {
+    folder: Folder;
+    onChange: (type: string, id: string, manageAcl: boolean) => void;
+    onSearch: (name: string) => Thenable<{ groups: OCSGroup[]; users: OCSUser[]; }>;
+};
+
+function ManageAclSelect({ onChange, onSearch, folder }: ManageAclSelectProps) {
+    const handleSearch = (inputValue: string) => {
+        return new Promise(resolve => {
+            onSearch(inputValue).then((result) => {
+                resolve([...result.groups, ...result.users])
+            })
+        })
+    }
+
+    const typeLabel = (item) => {
+        return item.type === 'user' ? 'User' : 'Group'
+    }
+    return <AsyncSelect
+        loadOptions={handleSearch}
+        isMulti
+        cacheOptions
+        defaultOptions
+        defaultValue={folder.manage}
+        isClearable={false}
+        onChange={(option, details) => {
+            if (details.action === 'select-option') {
+                const addedOption = details.option
+                onChange && onChange(addedOption.type, addedOption.id, true)
+            }
+            if (details.action === 'remove-value') {
+                const removedValue = details.removedValue
+                onChange && onChange(removedValue.type, removedValue.id, false)
+            }
+        }}
+        placeholder={t('templaterepo', 'Users/groups that can manage')}
+        getOptionLabel={(option) => `${option.displayname} (${typeLabel(option)})`}
+        getOptionValue={(option) => option.type + '/' + option.id}
+        styles={{
+            control: base => ({
+                ...base,
+                minHeight: 25,
+                borderWidth: 1
+            }),
+            dropdownIndicator: base => ({
+                ...base,
+                padding: 4
+            }),
+            clearIndicator: base => ({
+                ...base,
+                padding: 4
+            }),
+            multiValue: base => ({
+                ...base,
+                backgroundColor: 'var(--color-background-dark)',
+                color: 'var(--color-text)'
+            }),
+            valueContainer: base => ({
+                ...base,
+                padding: '0px 6px'
+            }),
+            input: base => ({
+                ...base,
+                margin: 0,
+                padding: 0
+            }),
+            menu: (provided) => ({
+                ...provided,
+                backgroundColor: 'var(--color-main-background)',
+                borderColor: 'var(--color-border)',
+            })
+        }}
+    />
 }

@@ -33,7 +33,7 @@ class GroupMountPoint extends MountPoint {
 	}
 
 	public function getMountType() {
-		return 'group';
+		return 'templaterepo';
 	}
 
 	public function getOption($name, $default) {

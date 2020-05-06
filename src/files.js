@@ -29,9 +29,9 @@ __webpack_public_path__ = OC.linkTo('templaterepo', 'js/')
 
 window.addEventListener('DOMContentLoaded', () => {
 	if (OCA.Theming) {
-		OC.MimeType._mimeTypeIcons['dir-group'] = generateUrl('/apps/theming/img/templaterepo/folder-group.svg?v=' + OCA.Theming.cacheBuster)
+		OC.MimeType._mimeTypeIcons['dir-templaterepo'] = generateUrl('/apps/theming/img/templaterepo/folder-group.svg?v=' + OCA.Theming.cacheBuster)
 	} else {
-		OC.MimeType._mimeTypeIcons['dir-group'] = imagePath('templaterepo', 'folder-group')
+		OC.MimeType._mimeTypeIcons['dir-templaterepo'] = imagePath('templaterepo', 'folder-group')
 	}
 
 	if (!OCA?.Sharing?.ShareTabSections) {
@@ -39,7 +39,7 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 	import(/* webpackChunkName: "sharing" */'./SharingSidebarApp').then((Module) => {
 		OCA.Sharing.ShareTabSections.registerSection((el, fileInfo) => {
-			if (fileInfo.mountType !== 'group') {
+			if (fileInfo.mountType !== 'templaterepo') {
 				return
 			}
 			return Module.default

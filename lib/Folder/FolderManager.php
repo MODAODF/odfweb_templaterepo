@@ -120,7 +120,7 @@ class FolderManager {
 
 		$query = $this->connection->getQueryBuilder();
 
-		$query->select('folder_id', 'mount_point', 'quota', 'size', 'acl')
+		$query->select('folder_id', 'mount_point', 'quota', 'size', 'acl', 'api_server')
 			->from('template_repo', 'f');
 		$this->joinQueryWithFileCache($query, $rootStorageId);
 
@@ -140,7 +140,8 @@ class FolderManager {
 				'quota' => (int)$row['quota'],
 				'size' => $row['size'] ? (int)$row['size'] : 0,
 				'acl' => (bool)$row['acl'],
-				'manage' => $this->getManageAcl($mappings)
+				'manage' => $this->getManageAcl($mappings),
+				'api_server' => $row['api_server']
 			];
 		}
 
@@ -758,6 +759,7 @@ class FolderManager {
 	 * @throws Exception
 	 */
 	public function getFoldersForUser(IUser $user, int $rootStorageId = 0): array {
+		/*
 		$groups = $this->groupManager->getUserGroupIds($user);
 		$folders = $this->getFoldersForGroups($groups, $rootStorageId);
 
@@ -770,8 +772,9 @@ class FolderManager {
 				$mergedFolders[$id] = $folder;
 			}
 		}
-
-		// Additional folder by User
+		*/
+		$mergedFolders = [];
+		// Show manager directory only for User
 		$folders = $this->getFoldersByUSer($user->getUID(), $rootStorageId);
 		foreach ($folders as $folder) {
 			$id = (int)$folder['folder_id'];
@@ -783,6 +786,35 @@ class FolderManager {
 		}
 
 		return array_values($mergedFolders);
+	}
+
+	/**
+	 * @param string $folderId
+	 * @param string $apiServer
+	 */
+	public function setAPIServer($folderId, $apiServer)	{
+		$query = $this->connection->getQueryBuilder();
+
+		$query->update('template_repo')
+			->set('api_server', $query->createNamedParameter($apiServer))
+			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)));
+		$query->execute();
+	}
+
+	public function getAPIServer($folderId)	{
+		$query = $this->connection->getQueryBuilder();
+		$query->select('api_server')
+			->from('template_repo')
+			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)));
+
+		$rows = $query->execute()->fetchAll();
+
+		$api_server = "";
+		foreach ($rows as $row) {
+			$api_server = $row['api_server'];
+		}
+
+		return $api_server;
 	}
 
 	/**

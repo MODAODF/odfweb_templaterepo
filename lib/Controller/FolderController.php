@@ -300,4 +300,13 @@ class FolderController extends OCSController {
 		$files = $this->formatNodes($nodes);
 		return new JSONResponse(['files' => $files]);
 	}
+
+	/* @param int $id
+	 * @param string $apiserver
+	 * @return DataResponse
+	 */
+	public function setAPIServer($id, $apiserver) {
+		$this->manager->setAPIServer($id, $apiserver);
+		return new DataResponse(true);
+ 	}
 }

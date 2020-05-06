@@ -37,6 +37,9 @@ use Sabre\DAV\PropPatch;
 use Sabre\DAV\Server;
 use Sabre\DAV\ServerPlugin;
 use Sabre\Xml\Reader;
+use Sabre\DAV\Exception;
+use Sabre\HTTP\RequestInterface;
+use Sabre\HTTP\ResponseInterface;
 
 class ACLPlugin extends ServerPlugin {
 	public const ACL_ENABLED = '{http://nextcloud.org/ns}acl-enabled';
@@ -72,6 +75,10 @@ class ACLPlugin extends ServerPlugin {
 
 		$this->server->on('propFind', [$this, 'propFind']);
 		$this->server->on('propPatch', [$this, 'propPatch']);
+
+		// 這裡可以註冊的方法請參考 sabre 的 event
+		// https://sabre.io/dav/writing-plugins/
+		$this->server->on('afterMethod', [$this, 'afterMethod']);
 
 		$this->server->xml->elementMap[Rule::ACL] = Rule::class;
 		$this->server->xml->elementMap[self::ACL_LIST] = function (Reader $reader): array {
@@ -227,5 +234,9 @@ class ACLPlugin extends ServerPlugin {
 
 			return true;
 		});
+	}
+
+	function afterMethod(RequestInterface $request, ResponseInterface $response) {
+		$x = 1;
 	}
 }

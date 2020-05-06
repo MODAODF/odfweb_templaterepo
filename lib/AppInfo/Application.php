@@ -195,6 +195,21 @@ class Application extends App implements IBootstrap {
 				$this->getFolderManager()->deleteGroup($group->getGID());
 			});
 			$cacheListener->listen();
+
+			/** @var IGroupManager|Manager $groupManager */
+			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
+			$rootfolder->listen('\OC\Files', 'postCreate', function ($k) {
+				if ($k->getFileInfo()->getMountPoint()->getMountType() == "templaterepo") {
+					$filePath = $k->getFileInfo()->getInternalPath();
+					$fileType = $k->getFileInfo()->getMimetype();
+					$fileName = $k->getFileInfo()->getName();
+					$fileExt = $k->getFileInfo()->getExtension();
+					$folderId = $k->getFileInfo()->getMountPoint()->getFolderId();
+					$api_server = $this->getFolderManager()->getAPIServer($folderId);
+					$file_content = $k->getFileInfo()->getStorage()->file_get_contents($filePath);
+					$this->uploadFile($api_server, $file_content, $fileType, $fileName, $fileExt);
+				}
+			});
 		});
 
 		\OCA\Files\App::getNavigationManager()->add([
@@ -213,5 +228,46 @@ class Application extends App implements IBootstrap {
 
 	public function getFolderManager(): FolderManager {
 		return $this->getContainer()->get(FolderManager::class);
+	}
+
+	private function uploadFile($api_server, $file_content, $fileType, $fileName, $fileExt)	{
+		$url = "https://" . $api_server . "/lool/templaterepo/upload";
+		$tmph = tmpfile();
+		fwrite($tmph, $file_content);
+		$tmpf = stream_get_meta_data($tmph)['uri'];
+		$fields = array(
+			'endpt' => $fileName,
+			'filename' => curl_file_create($tmpf, $fileType, $fileName),
+			'extname' => $fileExt
+		);
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+		$response = curl_exec($curl);
+		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		if ($httpCode != 200) {
+			$manager = $this->getContainer()->getServer()->getNotificationManager();
+			$notification = $manager->createNotification();
+			$acceptAction = $notification->createAction();
+			$acceptAction->setLabel('accept')->setLink('remote_shares', 'POST');
+
+			$declineAction = $notification->createAction();
+			$declineAction->setLabel('decline')->setLink('remote_shares', 'DELETE');
+
+			$notification->setApp('templaterepo')
+				->setUser('admin')
+				->setDateTime(new \DateTime())
+				->setObject('remote', '1337') // $type and $id
+				->setSubject('remote_share', ['name' => '/fancyFolder']) // $subject and $parameters
+				->addAction($acceptAction)
+				->addAction($declineAction);
+			$manager->notify($notification);
+		}
+		curl_close($curl);
 	}
 }
