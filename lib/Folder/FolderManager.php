@@ -116,6 +116,7 @@ class FolderManager {
 	 */
 	public function getAllFoldersWithSize(int $rootStorageId): array {
 		$applicableMap = $this->getAllApplicable();
+		$applicableUserMap = $this->getAllApplicableUser();
 
 		$query = $this->connection->getQueryBuilder();
 
@@ -135,6 +136,7 @@ class FolderManager {
 				'id' => $id,
 				'mount_point' => $row['mount_point'],
 				'groups' => $applicableMap[$id] ?? [],
+				'users' => isset($applicableUserMap[$id]) ? $applicableUserMap[$id] : [],
 				'quota' => (int)$row['quota'],
 				'size' => $row['size'] ? (int)$row['size'] : 0,
 				'acl' => (bool)$row['acl'],
@@ -298,6 +300,26 @@ class FolderManager {
 		return $applicableMap;
 	}
 
+	private function getAllApplicableUser(bool $permissionOnly = true) {
+		$query = $this->connection->getQueryBuilder();
+
+		$query->select('folder_id', 'user_id', 'permissions')
+			->from('group_folders_users');
+
+		$rows = $query->execute()->fetchAll();
+
+		$applicableMap = [];
+		foreach ($rows as $row) {
+			$id = (int)$row['folder_id'];
+			if (!isset($applicableMap[$id])) {
+				$applicableMap[$id] = [];
+			}
+			$applicableMap[$id][$row['user_id']] = (int)$row['permissions'];
+		}
+
+		return $applicableMap;
+	}
+
 	/**
 	 * @throws Exception
 	 */
@@ -393,6 +415,44 @@ class FolderManager {
 			}
 		}
 		return array_values($users);
+	}
+
+ 	/**
+	 * 取出具備這個使用者管理的資料夾
+	 * @param string $groupId
+	 * @param int $rootStorageId
+	 * @return array[]
+	 */
+	public function getFoldersByUser($userId, $rootStorageId = 0) {
+		$query = $this->connection->getQueryBuilder();
+
+		$query->select(
+			'f.folder_id', 'mount_point', 'quota', 'acl',
+			'fileid', 'storage', 'path', 'name', 'mimetype', 'mimepart', 'size', 'mtime', 'storage_mtime', 'etag', 'encrypted', 'parent'
+		)
+			->selectAlias('a.permissions', 'user_permissions')
+			->selectAlias('c.permissions', 'permissions')
+			->from('group_folders', 'f')
+			->innerJoin(
+				'f',
+				'group_folders_users',
+				'a',
+				$query->expr()->eq('f.folder_id', 'a.folder_id')
+			)
+			->where($query->expr()->eq('a.user_id', $query->createNamedParameter($userId)));
+		$this->joinQueryWithFileCache($query, $rootStorageId);
+
+		$result = $query->execute()->fetchAll();
+		return array_map(function ($folder) {
+			return [
+				'folder_id' => (int)$folder['folder_id'],
+				'mount_point' => $folder['mount_point'],
+				'permissions' => (int)$folder['user_permissions'],
+				'quota' => (int)$folder['quota'],
+				'acl' => (bool)$folder['acl'],
+				'rootCacheEntry' => (isset($folder['fileid'])) ? Cache::cacheEntryFromData($folder, $this->mimeTypeLoader) : null
+			];
+		}, $result);
 	}
 
 	/**
@@ -559,6 +619,27 @@ class FolderManager {
 		$query->executeStatement();
 	}
 
+	public function addApplicableUser($folderId, $userId) {
+		$query = $this->connection->getQueryBuilder();
+
+		$query->insert('group_folders_users')
+			->values([
+				'folder_id' => $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT),
+				'user_id' => $query->createNamedParameter($userId),
+				'permissions' => $query->createNamedParameter(Constants::PERMISSION_ALL)
+			]);
+		$query->execute();
+	}
+
+	public function removeApplicableUser($folderId, $userId) {
+		$query = $this->connection->getQueryBuilder();
+
+		$query->delete('group_folders_users')
+			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)))
+			->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
+		$query->execute();
+	}
+
 	/**
 	 * @throws Exception
 	 */
@@ -571,6 +652,17 @@ class FolderManager {
 			->andWhere($query->expr()->eq('group_id', $query->createNamedParameter($groupId)));
 
 		$query->executeStatement();
+	}
+
+	public function setUserPermissions($folderId, $userId, $permissions) {
+		$query = $this->connection->getQueryBuilder();
+
+		$query->update('group_folders_users')
+			->set('permissions', $query->createNamedParameter($permissions, IQueryBuilder::PARAM_INT))
+			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)))
+			->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
+
+		$query->execute();
 	}
 
 	/**
@@ -672,6 +764,17 @@ class FolderManager {
 		$mergedFolders = [];
 		foreach ($folders as $folder) {
 			$id = $folder['folder_id'];
+			if (isset($mergedFolders[$id])) {
+				$mergedFolders[$id]['permissions'] |= $folder['permissions'];
+			} else {
+				$mergedFolders[$id] = $folder;
+			}
+		}
+
+		// Additional folder by User
+		$folders = $this->getFoldersByUSer($user->getUID(), $rootStorageId);
+		foreach ($folders as $folder) {
+			$id = (int)$folder['folder_id'];
 			if (isset($mergedFolders[$id])) {
 				$mergedFolders[$id]['permissions'] |= $folder['permissions'];
 			} else {

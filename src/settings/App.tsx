@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {ChangeEvent, Component, FormEvent} from 'react';
 
-import {Api, Folder, Group, ManageRuleProps, OCSGroup, OCSUser} from './Api';
+import {Api, Folder, Group, User, ManageRuleProps, OCSGroup, OCSUser} from './Api';
 import {FolderGroups} from './FolderGroups';
 import {QuotaSelect} from './QuotaSelect';
 import './App.scss';
@@ -10,6 +10,7 @@ import {SortArrow} from "./SortArrow";
 import FlipMove from "react-flip-move";
 import AsyncSelect from 'react-select/async'
 import Thenable = JQuery.Thenable;
+import {FolderUsers} from './FolderUsers';
 
 const defaultQuotaOptions = {
 	'1 GB': 1073741274,
@@ -23,8 +24,10 @@ export type SortKey = 'mount_point' | 'quota' | 'groups' | 'acl';
 export interface AppState {
 	folders: Folder[];
 	groups: Group[],
+	users: User[];
 	newMountPoint: string;
 	editingGroup: number;
+	editingUser: number;
 	editingMountPoint: number;
 	renameMountPoint: string;
 	filter: string;
@@ -38,8 +41,10 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 	state: AppState = {
 		folders: [],
 		groups: [],
+		users: [],
 		newMountPoint: '',
 		editingGroup: 0,
+		editingUser: 0,
 		editingMountPoint: 0,
 		renameMountPoint: '',
 		filter: '',
@@ -53,6 +58,9 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 		});
 		this.api.listGroups().then((groups) => {
 			this.setState({groups});
+		});
+		this.api.listUsers().then((users) => {
+			this.setState({users});
 		});
 		OC.Plugins.register('OCA.Search.Core', this);
 	}
@@ -69,6 +77,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 			folders.push({
 				mount_point: mountPoint,
 				groups: {},
+				users: {},
 				quota: -3,
 				size: 0,
 				id,
@@ -113,11 +122,32 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 		this.api.removeGroup(folder.id, group);
 	}
 
+	addUser(folder: Folder, user: string) {
+		const folders = this.state.folders;
+		folder.users[user] = OC.PERMISSION_ALL;
+		this.setState({folders });
+		this.api.addUser(folder.id, user);
+	}
+
+	removeUser(folder: Folder, user: string) {
+		const folders = this.state.folders;
+		delete folder.users[user];
+		this.setState({folders });
+		this.api.removeUser(folder.id, user);
+	}
+
 	setPermissions(folder: Folder, group: string, newPermissions: number) {
 		const folders = this.state.folders;
 		folder.groups[group] = newPermissions;
 		this.setState({folders});
 		this.api.setPermissions(folder.id, group, newPermissions);
+	}
+
+	setPermissionsForUser(folder: Folder, user: string, newPermissions: number) {
+		const folders = this.state.folders;
+		folder.users[user] = newPermissions;
+		this.setState({folders });
+		this.api.setPermissions(folder.id, user, newPermissions);
 	}
 
 	setManageACL(folder: Folder, type: string, id: string, manageACL: boolean) {
@@ -231,6 +261,20 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 							onSetPermissions={this.setPermissions.bind(this, folder)}
 						/>
 					</td>
+					<td className="users">
+						<FolderUsers
+							edit={this.state.editingUser === id}
+							showEdit={event => {
+								event.stopPropagation();
+								this.setState({ editingUser: id })
+							}}
+							users={folder.users}
+							allUsers={this.state.users}
+							onAddUser={this.addUser.bind(this, folder)}
+							removeUser={this.removeUser.bind(this, folder)}
+							onSetPermissions={this.setPermissionsForUser.bind(this, folder)}
+						/>
+					</td>
 					<td className="quota">
 						<QuotaSelect options={defaultQuotaOptions}
 									 value={folder.quota}
@@ -264,7 +308,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 
 		return <div id="groupfolders-react-root"
 					onClick={() => {
-						this.setState({editingGroup: 0, editingMountPoint: 0})
+						this.setState({editingGroup: 0, editingUser: 0, editingMountPoint: 0})
 					}}>
 			<table>
 				<thead>
@@ -278,6 +322,11 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 						{t('groupfolders', 'Groups')}
 						<SortArrow name='groups' value={this.state.sort}
 								   direction={this.state.sortOrder}/>
+					</th>
+					<th onClick={() => this.onSortClick('groups')}>
+						{t('groupfolders', 'Users')}
+						<SortArrow name='users' value={this.state.sort}
+							direction={this.state.sortOrder} />
 					</th>
 					<th onClick={() => this.onSortClick('quota')}>
 						{t('groupfolders', 'Quota')}
