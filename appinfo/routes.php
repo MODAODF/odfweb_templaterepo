@@ -38,10 +38,25 @@ return ['routes' => [
 		'requirements' => ['group' => '.+']
 	],
 	[
+		'name' => 'Folder#addUser',
+		'url' => '/folders/{id}/users',
+		'verb' => 'POST'
+	],
+	[
+		'name' => 'Folder#removeUser',
+		'url' => '/folders/{id}/users/{user}',
+		'verb' => 'DELETE'
+	],
+	[
 		'name' => 'Folder#setPermissions',
 		'url' => '/folders/{id}/groups/{group}',
 		'verb' => 'POST',
 		'requirements' => ['group' => '.+']
+	],
+	[
+		'name' => 'Folder#setPermissionsForUser',
+		'url' => '/folders/{id}/users/{user}',
+		'verb' => 'POST'
 	],
 	[
 		'name' => 'Folder#setManageACL',

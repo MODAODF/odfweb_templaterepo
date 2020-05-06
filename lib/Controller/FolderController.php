@@ -146,6 +146,26 @@ class FolderController extends OCSController {
 		return new DataResponse(['success' => true]);
 	}
 
+ 	/**
+ 	 * @param int $id
+	 * @param string $user
+	 * @return DataResponse
+	 */
+	public function addUser($id, $user) {
+		$this->manager->addApplicableUser($id, $user);
+		return new DataResponse(true);
+	}
+
+	/**
+	 * @param int $id
+	 * @param string $user
+	 * @return DataResponse
+	 */
+	public function removeUser($id, $user) {
+		$this->manager->removeApplicableUser($id, $user);
+		return new DataResponse(true);
+	}
+
 	/**
 	 * @NoAdminRequired
 	 * @RequireGroupFolderAdmin
@@ -153,6 +173,17 @@ class FolderController extends OCSController {
 	public function setPermissions(int $id, string $group, int $permissions): DataResponse {
 		$this->manager->setGroupPermissions($id, $group, $permissions);
 		return new DataResponse(['success' => true]);
+	}
+
+	/**
+	 * @param int $id
+	 * @param string $group
+	 * @param string $permissions
+	 * @return DataResponse
+	 */
+	public function setPermissionsForUser($id, $user, $permissions) {
+		$this->manager->setUserPermissions($id, $user, $permissions);
+		return new DataResponse(true);
 	}
 
 	/**
