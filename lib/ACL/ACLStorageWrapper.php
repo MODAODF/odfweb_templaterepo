@@ -21,7 +21,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\ACL;
+namespace OCA\TemplateRepo\ACL;
 
 use Icewind\Streams\IteratorDirectory;
 use OC\Files\Storage\Wrapper\Wrapper;

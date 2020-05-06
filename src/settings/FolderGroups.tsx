@@ -63,10 +63,10 @@ export function FolderGroups({groups, allGroups = [], onAddGroup, removeGroup, e
 					  onClick={event => event.stopPropagation()}>
 			<thead>
 			<tr>
-				<th>{t('groupfolders', 'Group')}</th>
-				<th>{t('groupfolders', 'Write')}</th>
-				<th>{t('groupfolders', 'Share')}</th>
-				<th>{t('groupfolders', 'Delete')}</th>
+				<th>{t('templaterepo', 'Group')}</th>
+				<th>{t('templaterepo', 'Write')}</th>
+				<th>{t('templaterepo', 'Share')}</th>
+				<th>{t('templaterepo', 'Delete')}</th>
 				<th/>
 			</tr>
 			</thead>
@@ -109,7 +109,7 @@ interface AdminGroupSelectProps {
 function AdminGroupSelect({allGroups, onChange}: AdminGroupSelectProps) {
 	if (allGroups.length === 0) {
 		return <div className="no-options-available">
-			<p>{t('groupfolders', 'No other groups available')}</p>
+			<p>{t('templaterepo', 'No other groups available')}</p>
 		</div>;
 	}
 	const options = allGroups.map(group => {
@@ -124,7 +124,7 @@ function AdminGroupSelect({allGroups, onChange}: AdminGroupSelectProps) {
 			onChange && option && onChange(option.value)
 		}}
 		options={options}
-		placeholder={t('groupfolders', 'Add group')}
+		placeholder={t('templaterepo', 'Add group')}
 		styles={{
 			input: (provided) => ({
 				...provided,

@@ -17,7 +17,7 @@
       <clover outputFile="./clover.xml"/>
     </report>
   </coverage>
-  <testsuite name="Nextcloud - Group folders App Tests">
+  <testsuite name="Nextcloud - Template repo App Tests">
     <directory suffix=".php">.</directory>
   </testsuite>
   <logging/>

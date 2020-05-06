@@ -21,12 +21,12 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\groupfolders\tests\ACL;
+namespace OCA\templaterepo\tests\ACL;
 
-use OCA\GroupFolders\ACL\ACLManager;
-use OCA\GroupFolders\ACL\Rule;
-use OCA\GroupFolders\ACL\RuleManager;
-use OCA\GroupFolders\ACL\UserMapping\IUserMapping;
+use OCA\TemplateRepo\ACL\ACLManager;
+use OCA\TemplateRepo\ACL\Rule;
+use OCA\TemplateRepo\ACL\RuleManager;
+use OCA\TemplateRepo\ACL\UserMapping\IUserMapping;
 use OCP\Constants;
 use OCP\Files\IRootFolder;
 use OCP\Files\Mount\IMountPoint;

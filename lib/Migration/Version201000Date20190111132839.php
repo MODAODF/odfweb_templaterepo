@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\GroupFolders\Migration;
+namespace OCA\TemplateRepo\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -14,19 +14,19 @@ use OCP\Migration\IOutput;
  */
 class Version201000Date20190111132839 extends SimpleMigrationStep {
 	public function name(): string {
-		return 'Add groupfolder_acl table';
+		return 'Add templaterepo_acl table';
 	}
 
 	public function description(): string {
-		return 'Adds table to store ACL information for group folders';
+		return 'Adds table to store ACL information for template repo';
 	}
 
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable('group_folders_acl')) {
-			$table = $schema->createTable('group_folders_acl');
+		if (!$schema->hasTable('template_repo_acl')) {
+			$table = $schema->createTable('template_repo_acl');
 			$table->addColumn('acl_id', 'bigint', [
 				'autoincrement' => true,
 				'notnull' => true,
@@ -50,8 +50,8 @@ class Version201000Date20190111132839 extends SimpleMigrationStep {
 				'notnull' => true,
 			]);
 			$table->setPrimaryKey(['acl_id']);
-			$table->addIndex(['mapping_type', 'mapping_id'], 'groups_folder_acl_mapping');
-			$table->addUniqueIndex(['fileid', 'mapping_type', 'mapping_id'], 'groups_folder_acl_unique');
+			$table->addIndex(['mapping_type', 'mapping_id'], 'templates_repo_acl_mapping');
+			$table->addUniqueIndex(['fileid', 'mapping_type', 'mapping_id'], 'templates_repo_acl_unique');
 		}
 
 		return $schema;

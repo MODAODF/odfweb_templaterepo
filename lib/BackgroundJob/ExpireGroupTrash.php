@@ -22,9 +22,9 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\BackgroundJob;
+namespace OCA\TemplateRepo\BackgroundJob;
 
-use OCA\GroupFolders\Trash\TrashBackend;
+use OCA\TemplateRepo\Trash\TrashBackend;
 use OCA\Files_Trashbin\Expiration;
 use OCP\IConfig;
 use OCP\BackgroundJob\TimedJob;

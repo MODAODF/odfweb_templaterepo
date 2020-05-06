@@ -21,7 +21,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command;
+namespace OCA\TemplateRepo\Command;
 
 use OC\Files\ObjectStore\NoopScanner;
 use OCP\Constants;
@@ -35,8 +35,8 @@ use OCP\Files\Cache\IScanner;
 class Scan extends FolderCommand {
 	protected function configure() {
 		$this
-			->setName('groupfolders:scan')
-			->setDescription('Scan a group folder for outside changes')
+			->setName('templaterepo:scan')
+			->setDescription('Scan a template repo for outside changes')
 			->addArgument(
 				'folder_id',
 				InputArgument::OPTIONAL,
@@ -85,7 +85,7 @@ class Scan extends FolderCommand {
 
 			$output->writeln("Scanning group folder with id\t<info>{$folder['id']}</info>", OutputInterface::VERBOSITY_VERBOSE);
 			if ($scanner instanceof NoopScanner) {
-				$output->writeln("Scanning group folders using an object store as primary storage is not supported.");
+				$output->writeln("Scanning template repo using an object store as primary storage is not supported.");
 				return -1;
 			}
 

@@ -22,15 +22,15 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command\ExpireGroup;
+namespace OCA\TemplateRepo\Command\ExpireGroup;
 
 use OCA\Files_Versions\Versions\IVersion;
-use OCA\GroupFolders\Versions\GroupVersionsExpireManager;
+use OCA\TemplateRepo\Versions\GroupVersionsExpireManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Trigger expiry of versions for files stored in group folders.
+ * Trigger expiry of versions for files stored in template repo.
  */
 class ExpireGroupVersions extends ExpireGroupBase {
 	protected GroupVersionsExpireManager $expireManager;
@@ -45,8 +45,8 @@ class ExpireGroupVersions extends ExpireGroupBase {
 	protected function configure() {
 		parent::configure();
 		$this
-			->setName('groupfolders:expire')
-			->setDescription('Trigger expiry of versions for files stored in group folders');
+			->setName('templaterepo:expire')
+			->setDescription('Trigger expiry of versions for files stored in template repo');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {

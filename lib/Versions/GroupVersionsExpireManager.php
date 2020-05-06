@@ -21,13 +21,13 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Versions;
+namespace OCA\TemplateRepo\Versions;
 
 use OC\Files\FileInfo;
 use OC\Files\View;
 use OC\Hooks\BasicEmitter;
 use OC\User\User;
-use OCA\GroupFolders\Folder\FolderManager;
+use OCA\TemplateRepo\Folder\FolderManager;
 use OCP\AppFramework\Utility\ITimeFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -64,7 +64,7 @@ class GroupVersionsExpireManager extends BasicEmitter {
 	 * @param array{id: int, mount_point: string, groups: array<empty, empty>|array<array-key, int>, quota: int, size: int, acl: bool} $folder
 	 */
 	public function expireFolder(array $folder): void {
-		$view = new View('/__groupfolders/versions/' . $folder['id']);
+		$view = new View('/__templaterepo/versions/' . $folder['id']);
 		$files = $this->versionsBackend->getAllVersionedFiles($folder);
 		$dummyUser = new User('', null, $this->dispatcher);
 		foreach ($files as $fileId => $file) {

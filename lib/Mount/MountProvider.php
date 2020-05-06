@@ -19,14 +19,14 @@
  *
  */
 
-namespace OCA\GroupFolders\Mount;
+namespace OCA\TemplateRepo\Mount;
 
 use OC\Files\Storage\Wrapper\Jail;
 use OC\Files\Storage\Wrapper\PermissionsMask;
 use OCA\GroupFolders\ACL\ACLManager;
-use OCA\GroupFolders\ACL\ACLManagerFactory;
-use OCA\GroupFolders\ACL\ACLStorageWrapper;
-use OCA\GroupFolders\Folder\FolderManager;
+use OCA\TemplateRepo\ACL\ACLManagerFactory;
+use OCA\TemplateRepo\ACL\ACLStorageWrapper;
+use OCA\TemplateRepo\Folder\FolderManager;
 use OCP\Constants;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\Files\Config\IMountProvider;
@@ -235,7 +235,7 @@ class MountProvider implements IMountProvider {
 			'root' => $rootPath
 		]);
 		if ($this->enableEncryption) {
-			$quotaStorage = new GroupFolderStorage([
+			$quotaStorage = new TemplateRepoStorage([
 				'storage' => $baseStorage,
 				'quota' => $quota,
 				'folder_id' => $id,

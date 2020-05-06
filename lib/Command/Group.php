@@ -21,10 +21,10 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command;
+namespace OCA\TemplateRepo\Command;
 
-use OCA\GroupFolders\Folder\FolderManager;
-use OCA\GroupFolders\Mount\MountProvider;
+use OCA\TemplateRepo\Folder\FolderManager;
+use OCA\TemplateRepo\Mount\MountProvider;
 use OCP\Constants;
 use OCP\Files\IRootFolder;
 use OCP\IGroupManager;
@@ -49,8 +49,8 @@ class Group extends FolderCommand {
 
 	protected function configure() {
 		$this
-			->setName('groupfolders:group')
-			->setDescription('Edit the groups that have access to a group folder')
+			->setName('templaterepo:group')
+			->setDescription('Edit the groups that have access to a template repo')
 			->addArgument('folder_id', InputArgument::REQUIRED, 'Id of the folder to configure')
 			->addArgument('group', InputArgument::REQUIRED, 'The group to configure')
 			->addArgument('permissions', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'The permissions to set for the group, leave empty for read only')

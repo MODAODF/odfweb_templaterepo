@@ -21,7 +21,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\ACL\UserMapping;
+namespace OCA\TemplateRepo\ACL\UserMapping;
 
 class UserMapping implements IUserMapping {
 	/** @var 'user'|'group' * */

@@ -1,6 +1,6 @@
 # Makefile for building the project
 
-app_name=groupfolders
+app_name=templaterepo
 project_dir=$(CURDIR)/../$(app_name)
 build_dir=$(project_dir)/build
 appstore_dir=$(build_dir)/appstore
@@ -73,4 +73,3 @@ appstore: clean build/main.js
 	$(project_dir)/ $(sign_dir)/$(app_name)
 	tar -czf $(build_dir)/$(app_name)-$(version)-$(BRANCH).tar.gz \
 		-C $(sign_dir) $(app_name)
-

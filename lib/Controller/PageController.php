@@ -19,7 +19,7 @@
  *
  */
 
-namespace OCA\GroupFolders\Controller;
+namespace OCA\TemplateRepo\Controller;
 
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\TemplateResponse;

@@ -24,7 +24,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Migration;
+namespace OCA\TemplateRepo\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -45,22 +45,22 @@ class Version1000000Date20210216085047 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		$table = $schema->getTable('group_folders_acl');
-		if ($table->hasIndex('groups_folder_acl_file')) {
-			$table->dropIndex('groups_folder_acl_file');
+		$table = $schema->getTable('template_repo_acl');
+		if ($table->hasIndex('templates_repo_acl_file')) {
+			$table->dropIndex('templates_repo_acl_file');
 		}
 
-		$table = $schema->getTable('group_folders_groups');
-		if ($table->hasIndex('group_folder')) {
-			$table->dropIndex('group_folder');
+		$table = $schema->getTable('template_repo_groups');
+		if ($table->hasIndex('template_repo')) {
+			$table->dropIndex('template_repo');
 		}
 
-		$table = $schema->getTable('group_folders_trash');
-		if ($table->hasIndex('groups_folder_trash_folder')) {
-			$table->dropIndex('groups_folder_trash_folder');
+		$table = $schema->getTable('template_repo_trash');
+		if ($table->hasIndex('templates_repo_trash_folder')) {
+			$table->dropIndex('templates_repo_trash_folder');
 		}
-		if ($table->hasIndex('groups_folder_name')) {
-			$table->dropIndex('groups_folder_name');
+		if ($table->hasIndex('templates_repo_name')) {
+			$table->dropIndex('templates_repo_name');
 		}
 
 		return $schema;

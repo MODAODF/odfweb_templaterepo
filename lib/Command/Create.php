@@ -21,10 +21,10 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command;
+namespace OCA\TemplateRepo\Command;
 
 use OC\Core\Command\Base;
-use OCA\GroupFolders\Folder\FolderManager;
+use OCA\TemplateRepo\Folder\FolderManager;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,8 +39,8 @@ class Create extends Base {
 
 	protected function configure() {
 		$this
-			->setName('groupfolders:create')
-			->setDescription('Create a new group folder')
+			->setName('templaterepo:create')
+			->setDescription('Create a new template repo')
 			->addArgument('name', InputArgument::REQUIRED, 'Name of the new folder');
 		parent::configure();
 	}

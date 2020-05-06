@@ -19,11 +19,11 @@
  *
  */
 
-namespace OCA\GroupFolders\Controller;
+namespace OCA\TemplateRepo\Controller;
 
 use OC\AppFramework\OCS\V1Response;
-use OCA\GroupFolders\Folder\FolderManager;
-use OCA\GroupFolders\Mount\MountProvider;
+use OCA\TemplateRepo\Folder\FolderManager;
+use OCA\TemplateRepo\Mount\MountProvider;
 use OCA\GroupFolders\Service\DelegationService;
 use OCA\GroupFolders\Service\FoldersFilter;
 use OCP\AppFramework\Http;
@@ -69,7 +69,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function getFolders(): DataResponse {
 		$folders = $this->manager->getAllFoldersWithSize($this->getRootFolderStorageId());
@@ -84,7 +84,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function getFolder(int $id): DataResponse {
 		$storageId = $this->getRootFolderStorageId();
@@ -100,7 +100,7 @@ class FolderController extends OCSController {
 	}
 
 	/**
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 * @NoAdminRequired
 	 */
 	public function addFolder(string $mountpoint): DataResponse {
@@ -110,7 +110,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function removeFolder(int $id): DataResponse {
 		$folder = $this->mountProvider->getFolder($id);
@@ -123,7 +123,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function setMountPoint(int $id, string $mountPoint): DataResponse {
 		$this->manager->setMountPoint($id, $mountPoint);
@@ -132,7 +132,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function addGroup(int $id, string $group): DataResponse {
 		$this->manager->addApplicableGroup($id, $group);
@@ -141,7 +141,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function removeGroup(int $id, string $group): DataResponse {
 		$this->manager->removeApplicableGroup($id, $group);
@@ -170,7 +170,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function setPermissions(int $id, string $group, int $permissions): DataResponse {
 		$this->manager->setGroupPermissions($id, $group, $permissions);
@@ -190,7 +190,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 * @throws \OCP\DB\Exception
 	 */
 	public function setManageACL(int $id, string $mappingType, string $mappingId, bool $manageAcl): DataResponse {
@@ -200,7 +200,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function setQuota(int $id, int $quota): DataResponse {
 		$this->manager->setFolderQuota($id, $quota);
@@ -209,7 +209,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function setACL(int $id, bool $acl): DataResponse {
 		$this->manager->setFolderACL($id, $acl);
@@ -218,7 +218,7 @@ class FolderController extends OCSController {
 
 	/**
 	 * @NoAdminRequired
-	 * @RequireGroupFolderAdmin
+	 * @RequireTemplateRepoAdmin
 	 */
 	public function renameFolder(int $id, string $mountpoint): DataResponse {
 		$this->manager->renameFolder($id, $mountpoint);

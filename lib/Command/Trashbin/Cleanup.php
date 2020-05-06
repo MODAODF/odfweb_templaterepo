@@ -23,11 +23,11 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command\Trashbin;
+namespace OCA\TemplateRepo\Command\Trashbin;
 
 use OC\Core\Command\Base;
-use OCA\GroupFolders\Folder\FolderManager;
-use OCA\GroupFolders\Trash\TrashBackend;
+use OCA\TemplateRepo\Folder\FolderManager;
+use OCA\TemplateRepo\Trash\TrashBackend;
 use OCP\Files\IRootFolder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -49,16 +49,16 @@ class Cleanup extends Base {
 
 	protected function configure() {
 		$this
-			->setName('groupfolders:trashbin:cleanup')
-			->setDescription('Empty the groupfolder trashbin')
-			->addArgument('folder_id', InputArgument::OPTIONAL, 'Id of the groupfolder')
+			->setName('templaterepo:trashbin:cleanup')
+			->setDescription('Empty the templaterepo trashbin')
+			->addArgument('folder_id', InputArgument::OPTIONAL, 'Id of the templaterepo')
 			->addOption('force', 'f', InputOption::VALUE_NONE, 'Skip confirmation');
 		parent::configure();
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		if (!$this->trashBackend) {
-			$output->writeln('<error>files_trashbin is disabled: group folders trashbin is not available</error>');
+			$output->writeln('<error>files_trashbin is disabled: template repo trashbin is not available</error>');
 			return -1;
 		}
 		$helper = $this->getHelper('question');
@@ -69,7 +69,7 @@ class Cleanup extends Base {
 
 			foreach ($folders as $folder) {
 				if ($folder['id'] === $folderId) {
-					$question = new ConfirmationQuestion('Are you sure you want to empty the trashbin of your group folder with id ' . $folderId . ', this can not be undone (y/N).', false);
+					$question = new ConfirmationQuestion('Are you sure you want to empty the trashbin of your template repo with id ' . $folderId . ', this can not be undone (y/N).', false);
 					if (!$input->getOption('force') && !$helper->ask($input, $output, $question)) {
 						return -1;
 					}
@@ -82,7 +82,7 @@ class Cleanup extends Base {
 			$output->writeln('<error>Folder not found: ' . $folderId . '</error>');
 			return -1;
 		} else {
-			$question = new ConfirmationQuestion('Are you sure you want to empty the trashbin of your group folders, this can not be undone (y/N).', false);
+			$question = new ConfirmationQuestion('Are you sure you want to empty the trashbin of your template repo, this can not be undone (y/N).', false);
 			if (!$input->getOption('force') && !$helper->ask($input, $output, $question)) {
 				return -1;
 			}

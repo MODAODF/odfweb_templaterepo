@@ -19,7 +19,7 @@
  *
  */
 
-namespace OCA\GroupFolders\Settings;
+namespace OCA\TemplateRepo\Settings;
 
 use OCA\GroupFolders\Service\ApplicationService;
 use OCA\GroupFolders\Service\DelegationService;
@@ -55,15 +55,15 @@ class Admin implements IDelegatedSettings {
 
 
 		return new TemplateResponse(
-			'groupfolders',
+			'templaterepo',
 			'index',
-			['appId' => 'groupfolders'],
+			['appId' => 'templaterepo'],
 			''
 		);
 	}
 
 	public function getSection(): string {
-		return 'groupfolders';
+		return 'templaterepo';
 	}
 
 	/**

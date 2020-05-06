@@ -65,10 +65,10 @@ export function FolderUsers({ users, allUsers = [], onAddUser, removeUser, edit,
 			onClick={event => event.stopPropagation()}>
 			<thead>
 				<tr>
-					<th>{t('groupfolders', 'User')}</th>
-					<th>{t('groupfolders', 'Write')}</th>
-					<th>{t('groupfolders', 'Share')}</th>
-					<th>{t('groupfolders', 'Delete')}</th>
+					<th>{t('templaterepo', 'User')}</th>
+					<th>{t('templaterepo', 'Write')}</th>
+					<th>{t('templaterepo', 'Share')}</th>
+					<th>{t('templaterepo', 'Delete')}</th>
 					<th />
 				</tr>
 			</thead>
@@ -111,7 +111,7 @@ interface UserSelectProps {
 function UserSelect({ allUsers, onChange }: UserSelectProps) {
 	if (allUsers.length === 0) {
 		return <div>
-			<p>{t('groupfolders', 'No other users available')}</p>
+			<p>{t('templaterepo', 'No other users available')}</p>
 		</div>;
 	}
 	const options = allUsers.map(user => {
@@ -126,7 +126,7 @@ function UserSelect({ allUsers, onChange }: UserSelectProps) {
 			onChange && onChange(option.value)
 		}}
 		options={options}
-		placeholder={t('groupfolders', 'Add user')}
+		placeholder={t('templaterepo', 'Add user')}
 		styles={{
 			input: (provided) => ({
 				...provided,
