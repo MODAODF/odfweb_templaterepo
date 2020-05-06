@@ -34,7 +34,7 @@ class GroupMountPoint extends MountPoint implements ISystemMountPoint {
 	}
 
 	public function getMountType() {
-		return 'group';
+		return 'templaterepo';
 	}
 
 	public function getFolderId(): int {
