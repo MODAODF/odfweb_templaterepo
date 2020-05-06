@@ -21,10 +21,10 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command;
+namespace OCA\TemplateRepo\Command;
 
 use OC\Core\Command\Base;
-use OCA\GroupFolders\Folder\FolderManager;
+use OCA\TemplateRepo\Folder\FolderManager;
 use OCP\Constants;
 use OCP\Files\IRootFolder;
 use OCP\IGroupManager;
@@ -53,8 +53,8 @@ class ListCommand extends Base {
 
 	protected function configure() {
 		$this
-			->setName('groupfolders:list')
-			->setDescription('List the configured group folders');
+			->setName('templaterepo:list')
+			->setDescription('List the configured template repo');
 		parent::configure();
 	}
 

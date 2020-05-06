@@ -30,7 +30,7 @@ const ACL_PROPERTIES = {
 	PROPERTY_ACL_ENABLED: '{' + OC.Files.Client.NS_NEXTCLOUD + '}acl-enabled',
 	PROPERTY_ACL_CAN_MANAGE: '{' + OC.Files.Client.NS_NEXTCLOUD + '}acl-can-manage',
 	PROPERTY_INHERITED_ACL_LIST: '{' + OC.Files.Client.NS_NEXTCLOUD + '}inherited-acl-list',
-	GROUP_FOLDER_ID: '{' + OC.Files.Client.NS_NEXTCLOUD + '}group-folder-id',
+	GROUP_FOLDER_ID: '{' + OC.Files.Client.NS_NEXTCLOUD + '}template-repo-id',
 }
 
 export default ACL_PROPERTIES

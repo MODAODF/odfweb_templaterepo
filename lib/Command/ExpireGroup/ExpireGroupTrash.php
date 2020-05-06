@@ -21,10 +21,10 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command\ExpireGroup;
+namespace OCA\TemplateRepo\Command\ExpireGroup;
 
 use OCA\Files_Trashbin\Expiration;
-use OCA\GroupFolders\Trash\TrashBackend;
+use OCA\TemplateRepo\Trash\TrashBackend;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -43,8 +43,8 @@ class ExpireGroupTrash extends ExpireGroupBase {
 
 	protected function configure() {
 		$this
-			->setName('groupfolders:expire')
-			->setDescription('Trigger expiration of the trashbin for files stored in group folders');
+			->setName('templaterepo:expire')
+			->setDescription('Trigger expiration of the trashbin for files stored in template repo');
 		parent::configure();
 	}
 

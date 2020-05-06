@@ -23,7 +23,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Helper;
+namespace OCA\TemplateRepo\Helper;
 
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
@@ -40,9 +40,9 @@ class LazyFolder implements Folder {
 	private function getFolder(): Folder {
 		if ($this->folder === null) {
 			try {
-				$this->folder = $this->rootFolder->get('__groupfolders');
+				$this->folder = $this->rootFolder->get('__templaterepo');
 			} catch (NotFoundException $e) {
-				$this->folder = $this->rootFolder->newFolder('__groupfolders');
+				$this->folder = $this->rootFolder->newFolder('__templaterepo');
 			}
 		}
 

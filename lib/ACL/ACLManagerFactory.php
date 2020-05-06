@@ -21,7 +21,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\ACL;
+namespace OCA\TemplateRepo\ACL;
 
 use OCP\IUser;
 

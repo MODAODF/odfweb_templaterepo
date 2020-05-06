@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\GroupFolders\Migration;
+namespace OCA\TemplateRepo\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -14,19 +14,19 @@ use OCP\Migration\IOutput;
  */
 class Version104000Date20180918132853 extends SimpleMigrationStep {
 	public function name(): string {
-		return 'Add group_folders_trash table';
+		return 'Add template_repo_trash table';
 	}
 
 	public function description(): string {
-		return 'Adds table to store trashbin information for group folders';
+		return 'Adds table to store trashbin information for template repo';
 	}
 
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		if (!$schema->hasTable('group_folders_trash')) {
-			$table = $schema->createTable('group_folders_trash');
+		if (!$schema->hasTable('template_repo_trash')) {
+			$table = $schema->createTable('template_repo_trash');
 			$table->addColumn('trash_id', 'bigint', [
 				'autoincrement' => true,
 				'notnull' => true,
@@ -49,7 +49,7 @@ class Version104000Date20180918132853 extends SimpleMigrationStep {
 				'length' => 6,
 			]);
 			$table->setPrimaryKey(['trash_id']);
-			$table->addUniqueIndex(['folder_id', 'name', 'deleted_time'], 'groups_folder_trash_unique');
+			$table->addUniqueIndex(['folder_id', 'name', 'deleted_time'], 'templates_repo_trash_unique');
 		}
 
 		return $schema;

@@ -1,6 +1,6 @@
 # Makefile for building the project
 
-app_name=groupfolders
+app_name=templaterepo
 project_dir=$(CURDIR)/../$(app_name)
 build_dir=$(project_dir)/build
 appstore_dir=$(build_dir)/appstore
@@ -8,7 +8,7 @@ sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 webpack=node_modules/.bin/webpack
-version+=8.0.0
+version+=1.0.0
 
 jssources=$(wildcard js/*) $(wildcard js/*/*) $(wildcard css/*/*)  $(wildcard css/*)
 othersources=$(wildcard appinfo/*) $(wildcard css/*/*) $(wildcard controller/*/*) $(wildcard templates/*/*) $(wildcard log/*/*)
@@ -73,4 +73,3 @@ appstore: clean build/main.js
 	$(project_dir)/ $(sign_dir)/$(app_name)
 	tar -czf $(build_dir)/$(app_name)-$(version)-$(BRANCH).tar.gz \
 		-C $(sign_dir) $(app_name)
-

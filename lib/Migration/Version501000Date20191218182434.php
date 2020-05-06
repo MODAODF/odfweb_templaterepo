@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\GroupFolders\Migration;
+namespace OCA\TemplateRepo\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -20,7 +20,7 @@ class Version501000Date20191218182434 extends SimpleMigrationStep {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 
-		$table = $schema->getTable('group_folders_trash');
+		$table = $schema->getTable('template_repo_trash');
 		if (!$table->hasColumn('file_id')) {
 			$table->addColumn('file_id', 'bigint', [
 				'notnull' => false,

@@ -19,7 +19,7 @@
  *
  */
 
-namespace OCA\GroupFolders\Settings;
+namespace OCA\TemplateRepo\Settings;
 
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Settings\IDelegatedSettings;
@@ -30,9 +30,9 @@ class Admin implements IDelegatedSettings {
 	 */
 	public function getForm() {
 		return new TemplateResponse(
-			'groupfolders',
+			'templaterepo',
 			'index',
-			['appId' => 'groupfolders'],
+			['appId' => 'templaterepo'],
 			''
 		);
 	}
@@ -41,7 +41,7 @@ class Admin implements IDelegatedSettings {
 	 * @return string the section ID, e.g. 'sharing'
 	 */
 	public function getSection() {
-		return 'groupfolders';
+		return 'templaterepo';
 	}
 
 	/**

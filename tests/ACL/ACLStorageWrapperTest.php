@@ -21,12 +21,12 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\groupfolders\tests\ACL;
+namespace OCA\templaterepo\tests\ACL;
 
 use OC\Files\Storage\Temporary;
 use Test\TestCase;
-use OCA\GroupFolders\ACL\ACLManager;
-use OCA\GroupFolders\ACL\ACLStorageWrapper;
+use OCA\TemplateRepo\ACL\ACLManager;
+use OCA\TemplateRepo\ACL\ACLStorageWrapper;
 use OCP\Constants;
 use OCP\Files\Storage\IStorage;
 

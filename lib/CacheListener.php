@@ -21,9 +21,9 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders;
+namespace OCA\TemplateRepo;
 
-use OCA\GroupFolders\Mount\GroupFolderStorage;
+use OCA\TemplateRepo\Mount\TemplateRepoStorage;
 use OCP\Files\Cache\CacheInsertEvent;
 use OCP\Files\Cache\CacheUpdateEvent;
 use OCP\Files\Cache\ICacheEvent;
@@ -42,11 +42,11 @@ class CacheListener {
 	}
 
 	public function onCacheEvent(ICacheEvent $event): void {
-		if (!$event->getStorage()->instanceOfStorage(GroupFolderStorage::class)) {
+		if (!$event->getStorage()->instanceOfStorage(TemplateRepoStorage::class)) {
 			return;
 		}
 
-		$jailedPath = preg_replace('/^__groupfolders\/\d+\//', '', $event->getPath());
+		$jailedPath = preg_replace('/^__templaterepo\/\d+\//', '', $event->getPath());
 		if ($jailedPath !== $event->getPath()) {
 			$event->setPath($jailedPath);
 		}

@@ -25,13 +25,13 @@ import './client'
 // eslint-disable-next-line
 __webpack_nonce__ = btoa(OC.requestToken)
 // eslint-disable-next-line
-__webpack_public_path__ = OC.linkTo('groupfolders', 'js/')
+__webpack_public_path__ = OC.linkTo('templaterepo', 'js/')
 
 window.addEventListener('DOMContentLoaded', () => {
 	if (OCA.Theming) {
-		OC.MimeType._mimeTypeIcons['dir-group'] = generateUrl('/apps/theming/img/groupfolders/folder-group.svg?v=' + OCA.Theming.cacheBuster)
+		OC.MimeType._mimeTypeIcons['dir-group'] = generateUrl('/apps/theming/img/templaterepo/folder-group.svg?v=' + OCA.Theming.cacheBuster)
 	} else {
-		OC.MimeType._mimeTypeIcons['dir-group'] = imagePath('groupfolders', 'folder-group')
+		OC.MimeType._mimeTypeIcons['dir-group'] = imagePath('templaterepo', 'folder-group')
 	}
 
 	if (!OCA?.Sharing?.ShareTabSections) {

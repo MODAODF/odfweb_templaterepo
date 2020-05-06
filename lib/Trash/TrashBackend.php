@@ -19,17 +19,17 @@
  *
  */
 
-namespace OCA\GroupFolders\Trash;
+namespace OCA\TemplateRepo\Trash;
 
 use OC\Files\Storage\Wrapper\Jail;
 use OCA\Files_Trashbin\Expiration;
 use OCA\Files_Trashbin\Trash\ITrashBackend;
 use OCA\Files_Trashbin\Trash\ITrashItem;
-use OCA\GroupFolders\ACL\ACLManagerFactory;
-use OCA\GroupFolders\Folder\FolderManager;
-use OCA\GroupFolders\Mount\GroupFolderStorage;
-use OCA\GroupFolders\Mount\MountProvider;
-use OCA\GroupFolders\Versions\VersionsBackend;
+use OCA\TemplateRepo\ACL\ACLManagerFactory;
+use OCA\TemplateRepo\Folder\FolderManager;
+use OCA\TemplateRepo\Mount\TemplateRepoStorage;
+use OCA\TemplateRepo\Mount\MountProvider;
+use OCA\TemplateRepo\Versions\VersionsBackend;
 use OCP\Constants;
 use OCP\Files\Folder;
 use OCP\Files\Node;
@@ -98,7 +98,7 @@ class TrashBackend implements ITrashBackend {
 				$trashItem->getTrashPath() . '/' . $node->getName(),
 				$node,
 				$user,
-				$trashItem->getGroupFolderMountPoint()
+				$trashItem->getTemplateRepoMountPoint()
 			);
 		}, $content);
 	}
@@ -109,7 +109,7 @@ class TrashBackend implements ITrashBackend {
 	 */
 	public function restoreItem(ITrashItem $item) {
 		if (!($item instanceof GroupTrashItem)) {
-			throw new \LogicException('Trying to restore normal trash item in group folder trash backend');
+			throw new \LogicException('Trying to restore normal trash item in template repo trash backend');
 		}
 		$user = $item->getUser();
 		[, $folderId] = explode('/', $item->getTrashPath());
@@ -176,7 +176,7 @@ class TrashBackend implements ITrashBackend {
 	 */
 	public function removeItem(ITrashItem $item) {
 		if (!($item instanceof GroupTrashItem)) {
-			throw new \LogicException('Trying to remove normal trash item in group folder trash backend');
+			throw new \LogicException('Trying to remove normal trash item in template repo trash backend');
 		}
 		$user = $item->getUser();
 		[, $folderId] = explode('/', $item->getTrashPath());
@@ -198,8 +198,8 @@ class TrashBackend implements ITrashBackend {
 	}
 
 	public function moveToTrash(IStorage $storage, string $internalPath): bool {
-		if ($storage->instanceOfStorage(GroupFolderStorage::class) && $storage->isDeletable($internalPath)) {
-			/** @var GroupFolderStorage|Jail $storage */
+		if ($storage->instanceOfStorage(TemplateRepoStorage::class) && $storage->isDeletable($internalPath)) {
+			/** @var TemplateRepoStorage|Jail $storage */
 			$name = basename($internalPath);
 			$fileEntry = $storage->getCache()->get($internalPath);
 			$folderId = $storage->getFolderId();
@@ -215,7 +215,7 @@ class TrashBackend implements ITrashBackend {
 					$trashStorage->getCache()->moveFromCache($unJailedStorage->getCache(), $unJailedInternalPath, $targetInternalPath);
 				}
 			} else {
-				throw new \Exception("Failed to move groupfolder item to trash");
+				throw new \Exception("Failed to move templaterepo item to trash");
 			}
 			return true;
 		} else {
@@ -245,15 +245,15 @@ class TrashBackend implements ITrashBackend {
 
 	private function userHasAccessToPath(IUser $user, string $path, int $permission = Constants::PERMISSION_READ): bool {
 		$activePermissions = $this->aclManagerFactory->getACLManager($user)
-			->getACLPermissionsForPath('__groupfolders/' . ltrim($path, '/'));
+			->getACLPermissionsForPath('__templaterepo/' . ltrim($path, '/'));
 		return (bool)($activePermissions & $permission);
 	}
 
 	private function getNodeForTrashItem(IUser $user, ITrashItem $trashItem): ?Node {
 		[, $folderId, $path] = explode('/', $trashItem->getTrashPath(), 3);
 		$folders = $this->folderManager->getFoldersForUser($user);
-		foreach ($folders as $groupFolder) {
-			if ($groupFolder['folder_id'] === (int)$folderId) {
+		foreach ($folders as $templateRepo) {
+			if ($templateRepo['folder_id'] === (int)$folderId) {
 				$trashRoot = $this->getTrashFolder((int)$folderId);
 				try {
 					$node = $trashRoot->get($path);

@@ -41,7 +41,7 @@ export interface Folder {
 
 export class Api {
 	getUrl(endpoint: string): string {
-		return OC.generateUrl(`apps/groupfolders/${endpoint}`);
+		return OC.generateUrl(`apps/templaterepo/${endpoint}`);
 	}
 
 	listFolders(): Thenable<Folder[]> {

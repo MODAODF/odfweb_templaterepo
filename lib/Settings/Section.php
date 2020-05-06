@@ -19,7 +19,7 @@
  *
  */
 
-namespace OCA\GroupFolders\Settings;
+namespace OCA\TemplateRepo\Settings;
 
 use OCP\IL10N;
 use OCP\IURLGenerator;
@@ -39,10 +39,10 @@ class Section implements IIconSection {
 	/**
 	 * @return string The ID of the section. It is supposed to be a lower case string, e.g. 'ldap'
 	 *
-	 * @psalm-return 'groupfolders'
+	 * @psalm-return 'templaterepo'
 	 */
 	public function getID() {
-		return 'groupfolders';
+		return 'templaterepo';
 	}
 
 	/**
@@ -52,7 +52,7 @@ class Section implements IIconSection {
 	 * @return string
 	 */
 	public function getName() {
-		return $this->l->t('Group folders');
+		return $this->l->t('Template repo');
 	}
 
 	/**
@@ -72,6 +72,6 @@ class Section implements IIconSection {
 	 * @return string
 	 */
 	public function getIcon() {
-		return $this->url->imagePath('groupfolders', 'app-dark.svg');
+		return $this->url->imagePath('templaterepo', 'app-dark.svg');
 	}
 }

@@ -19,11 +19,11 @@
  *
  */
 
-namespace OCA\GroupFolders\Folder;
+namespace OCA\TemplateRepo\Folder;
 
 use OC\Files\Cache\Cache;
 use OC\Files\Node\Node;
-use OCA\GroupFolders\Mount\GroupMountPoint;
+use OCA\TemplateRepo\Mount\GroupMountPoint;
 use OCP\Constants;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -66,7 +66,7 @@ class FolderManager {
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('folder_id', 'mount_point', 'quota', 'acl')
-			->from('group_folders', 'f');
+			->from('template_repo', 'f');
 
 		$rows = $query->executeQuery()->fetchAll();
 
@@ -89,13 +89,13 @@ class FolderManager {
 	/**
 	 * @throws Exception
 	 */
-	private function getGroupFolderRootId(int $rootStorageId): int {
+	private function getTemplateRepoRootId(int $rootStorageId): int {
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('fileid')
 			->from('filecache')
 			->where($query->expr()->eq('storage', $query->createNamedParameter($rootStorageId)))
-			->andWhere($query->expr()->eq('path_hash', $query->createNamedParameter(md5('__groupfolders'))));
+			->andWhere($query->expr()->eq('path_hash', $query->createNamedParameter(md5('__templaterepo'))));
 
 		return (int)$query->executeQuery()->fetchOne();
 	}
@@ -104,7 +104,7 @@ class FolderManager {
 		$query->leftJoin('f', 'filecache', 'c', $query->expr()->andX(
 			// concat with empty string to work around missing cast to string
 			$query->expr()->eq('name', $query->func()->concat('f.folder_id', $query->expr()->literal(""))),
-			$query->expr()->eq('parent', $query->createNamedParameter($this->getGroupFolderRootId($rootStorageId)))
+			$query->expr()->eq('parent', $query->createNamedParameter($this->getTemplateRepoRootId($rootStorageId)))
 		));
 	}
 
@@ -121,7 +121,7 @@ class FolderManager {
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('folder_id', 'mount_point', 'quota', 'size', 'acl')
-			->from('group_folders', 'f');
+			->from('template_repo', 'f');
 		$this->joinQueryWithFileCache($query, $rootStorageId);
 
 		$rows = $query->executeQuery()->fetchAll();
@@ -156,7 +156,7 @@ class FolderManager {
 	private function getAllFolderMappings(): array {
 		$query = $this->connection->getQueryBuilder();
 		$query->select('*')
-			->from('group_folders_manage');
+			->from('template_repo_manage');
 		$rows = $query->executeQuery()->fetchAll();
 
 		$folderMap = [];
@@ -182,7 +182,7 @@ class FolderManager {
 	private function getFolderMappings(int $id): array {
 		$query = $this->connection->getQueryBuilder();
 		$query->select('*')
-			->from('group_folders_manage')
+			->from('template_repo_manage')
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 
 		return $query->executeQuery()->fetchAll();
@@ -228,7 +228,7 @@ class FolderManager {
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('folder_id', 'mount_point', 'quota', 'size', 'acl')
-			->from('group_folders', 'f')
+			->from('template_repo', 'f')
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		$this->joinQueryWithFileCache($query, $rootStorageId);
 
@@ -257,7 +257,7 @@ class FolderManager {
 	public function getFolderAclEnabled(int $id): bool {
 		$query = $this->connection->getQueryBuilder();
 		$query->select('acl')
-			->from('group_folders', 'f')
+			->from('template_repo', 'f')
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($id, IQueryBuilder::PARAM_INT)));
 		$result = $query->executeQuery();
 		$row = $result->fetch();
@@ -284,7 +284,7 @@ class FolderManager {
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('folder_id', 'group_id', 'permissions')
-			->from('group_folders_groups');
+			->from('template_repo_groups');
 
 		$rows = $query->executeQuery()->fetchAll();
 
@@ -304,7 +304,7 @@ class FolderManager {
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('folder_id', 'user_id', 'permissions')
-			->from('group_folders_users');
+			->from('template_repo_users');
 
 		$rows = $query->execute()->fetchAll();
 
@@ -338,7 +338,7 @@ class FolderManager {
 
 	/**
 	 * Check if the user is able to configure the advanced folder permissions. This
-	 * is the case if the user is an admin, has admin permissions for the group folder
+	 * is the case if the user is an admin, has admin permissions for the template repo
 	 * app or is member of a group that can manage permissions for the specific folder.
 	 * @throws Exception
 	 */
@@ -352,14 +352,14 @@ class FolderManager {
 		if (class_exists('\OC\Settings\AuthorizedGroupMapper')) {
 			$authorizedGroupMapper = \OC::$server->get('\OC\Settings\AuthorizedGroupMapper');
 			$settingClasses = $authorizedGroupMapper->findAllClassesForUser($user);
-			if (in_array('OCA\GroupFolders\Settings\Admin', $settingClasses, true)) {
+			if (in_array('OCA\TemplateRepo\Settings\Admin', $settingClasses, true)) {
 				return true;
 			}
 		}
 
 		$query = $this->connection->getQueryBuilder();
 		$query->select('*')
-			->from('group_folders_manage')
+			->from('template_repo_manage')
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)))
 			->andWhere($query->expr()->eq('mapping_type', $query->createNamedParameter('user')))
 			->andWhere($query->expr()->eq('mapping_id', $query->createNamedParameter($userId)));
@@ -369,7 +369,7 @@ class FolderManager {
 
 		$query = $this->connection->getQueryBuilder();
 		$query->select('*')
-			->from('group_folders_manage')
+			->from('template_repo_manage')
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId)))
 			->andWhere($query->expr()->eq('mapping_type', $query->createNamedParameter('group')));
 		$groups = $query->executeQuery()->fetchAll();
@@ -432,10 +432,10 @@ class FolderManager {
 		)
 			->selectAlias('a.permissions', 'user_permissions')
 			->selectAlias('c.permissions', 'permissions')
-			->from('group_folders', 'f')
+			->from('template_repo', 'f')
 			->innerJoin(
 				'f',
-				'group_folders_users',
+				'template_repo_users',
 				'a',
 				$query->expr()->eq('f.folder_id', 'a.folder_id')
 			)
@@ -484,10 +484,10 @@ class FolderManager {
 		)
 			->selectAlias('a.permissions', 'group_permissions')
 			->selectAlias('c.permissions', 'permissions')
-			->from('group_folders', 'f')
+			->from('template_repo', 'f')
 			->innerJoin(
 				'f',
-				'group_folders_groups',
+				'template_repo_groups',
 				'a',
 				$query->expr()->eq('f.folder_id', 'a.folder_id')
 			)
@@ -536,10 +536,10 @@ class FolderManager {
 		)
 			->selectAlias('a.permissions', 'group_permissions')
 			->selectAlias('c.permissions', 'permissions')
-			->from('group_folders', 'f')
+			->from('template_repo', 'f')
 			->innerJoin(
 				'f',
-				'group_folders_groups',
+				'template_repo_groups',
 				'a',
 				$query->expr()->eq('f.folder_id', 'a.folder_id')
 			)
@@ -571,7 +571,7 @@ class FolderManager {
 	public function createFolder(string $mountPoint): int {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->insert('group_folders')
+		$query->insert('template_repo')
 			->values([
 				'mount_point' => $query->createNamedParameter($mountPoint)
 			]);
@@ -586,7 +586,7 @@ class FolderManager {
 	public function setMountPoint(int $folderId, string $mountPoint): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->update('group_folders')
+		$query->update('template_repo')
 			->set('mount_point', $query->createNamedParameter($mountPoint))
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)));
 		$query->executeStatement();
@@ -598,7 +598,7 @@ class FolderManager {
 	public function addApplicableGroup(int $folderId, string $groupId): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->insert('group_folders_groups')
+		$query->insert('template_repo_groups')
 			->values([
 				'folder_id' => $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT),
 				'group_id' => $query->createNamedParameter($groupId),
@@ -613,7 +613,7 @@ class FolderManager {
 	public function removeApplicableGroup(int $folderId, string $groupId): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->delete('group_folders_groups')
+		$query->delete('template_repo_groups')
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)))
 			->andWhere($query->expr()->eq('group_id', $query->createNamedParameter($groupId)));
 		$query->executeStatement();
@@ -622,7 +622,7 @@ class FolderManager {
 	public function addApplicableUser($folderId, $userId) {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->insert('group_folders_users')
+		$query->insert('template_repo_users')
 			->values([
 				'folder_id' => $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT),
 				'user_id' => $query->createNamedParameter($userId),
@@ -634,7 +634,7 @@ class FolderManager {
 	public function removeApplicableUser($folderId, $userId) {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->delete('group_folders_users')
+		$query->delete('template_repo_users')
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)))
 			->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
 		$query->execute();
@@ -646,7 +646,7 @@ class FolderManager {
 	public function setGroupPermissions(int $folderId, string $groupId, int $permissions): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->update('group_folders_groups')
+		$query->update('template_repo_groups')
 			->set('permissions', $query->createNamedParameter($permissions, IQueryBuilder::PARAM_INT))
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)))
 			->andWhere($query->expr()->eq('group_id', $query->createNamedParameter($groupId)));
@@ -657,7 +657,7 @@ class FolderManager {
 	public function setUserPermissions($folderId, $userId, $permissions) {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->update('group_folders_users')
+		$query->update('template_repo_users')
 			->set('permissions', $query->createNamedParameter($permissions, IQueryBuilder::PARAM_INT))
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)))
 			->andWhere($query->expr()->eq('user_id', $query->createNamedParameter($userId)));
@@ -671,14 +671,14 @@ class FolderManager {
 	public function setManageACL(int $folderId, string $type, string $id, bool $manageAcl): void {
 		$query = $this->connection->getQueryBuilder();
 		if ($manageAcl === true) {
-			$query->insert('group_folders_manage')
+			$query->insert('template_repo_manage')
 				->values([
 					'folder_id' => $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT),
 					'mapping_type' => $query->createNamedParameter($type),
 					'mapping_id' => $query->createNamedParameter($id)
 				]);
 		} else {
-			$query->delete('group_folders_manage')
+			$query->delete('template_repo_manage')
 				->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)))
 				->andWhere($query->expr()->eq('mapping_type', $query->createNamedParameter($type)))
 				->andWhere($query->expr()->eq('mapping_id', $query->createNamedParameter($id)));
@@ -692,7 +692,7 @@ class FolderManager {
 	public function removeFolder(int $folderId): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->delete('group_folders')
+		$query->delete('template_repo')
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)));
 		$query->executeStatement();
 	}
@@ -703,7 +703,7 @@ class FolderManager {
 	public function setFolderQuota(int $folderId, int $quota): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->update('group_folders')
+		$query->update('template_repo')
 			->set('quota', $query->createNamedParameter($quota))
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId)));
 		$query->executeStatement();
@@ -715,7 +715,7 @@ class FolderManager {
 	public function renameFolder(int $folderId, string $newMountPoint): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->update('group_folders')
+		$query->update('template_repo')
 			->set('mount_point', $query->createNamedParameter($newMountPoint))
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)));
 		$query->executeStatement();
@@ -727,7 +727,7 @@ class FolderManager {
 	public function deleteGroup(string $groupId): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->delete('group_folders_groups')
+		$query->delete('template_repo_groups')
 			->where($query->expr()->eq('group_id', $query->createNamedParameter($groupId)));
 		$query->executeStatement();
 	}
@@ -738,14 +738,14 @@ class FolderManager {
 	public function setFolderACL(int $folderId, bool $acl): void {
 		$query = $this->connection->getQueryBuilder();
 
-		$query->update('group_folders')
+		$query->update('template_repo')
 			->set('acl', $query->createNamedParameter((int)$acl, IQueryBuilder::PARAM_INT))
 			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId)));
 		$query->executeStatement();
 
 		if ($acl === false) {
 			$query = $this->connection->getQueryBuilder();
-			$query->delete('group_folders_manage')
+			$query->delete('template_repo_manage')
 				->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId)));
 			$query->executeStatement();
 		}

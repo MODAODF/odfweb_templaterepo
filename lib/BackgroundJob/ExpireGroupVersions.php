@@ -22,9 +22,9 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\BackgroundJob;
+namespace OCA\TemplateRepo\BackgroundJob;
 
-use OCA\GroupFolders\Versions\GroupVersionsExpireManager;
+use OCA\TemplateRepo\Versions\GroupVersionsExpireManager;
 use OCP\BackgroundJob\TimedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
 

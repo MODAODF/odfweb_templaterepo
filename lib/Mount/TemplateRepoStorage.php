@@ -19,7 +19,7 @@
  *
  */
 
-namespace OCA\GroupFolders\Mount;
+namespace OCA\TemplateRepo\Mount;
 
 use OC\Files\Cache\Scanner;
 use OC\Files\ObjectStore\NoopScanner;
@@ -30,7 +30,7 @@ use OCP\Files\Storage\IDisableEncryptionStorage;
 use OCP\IUser;
 use OCP\IUserSession;
 
-class GroupFolderStorage extends Quota implements IDisableEncryptionStorage {
+class TemplateRepoStorage extends Quota implements IDisableEncryptionStorage {
 	private int $folderId;
 	private ICacheEntry $rootEntry;
 	private IUserSession $userSession;

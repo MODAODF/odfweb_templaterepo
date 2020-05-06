@@ -21,11 +21,11 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command;
+namespace OCA\TemplateRepo\Command;
 
 use OC\Core\Command\Base;
-use OCA\GroupFolders\Folder\FolderManager;
-use OCA\GroupFolders\Mount\MountProvider;
+use OCA\TemplateRepo\Folder\FolderManager;
+use OCA\TemplateRepo\Mount\MountProvider;
 use OCP\Files\IRootFolder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

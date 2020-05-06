@@ -144,9 +144,9 @@ const FilesPlugin = {
 		client.addFileInfoParser((response) => {
 			const data = {}
 			const props = response.propStat[0].properties
-			const groupFolderId = props[ACL_PROPERTIES.GROUP_FOLDER_ID]
-			if (typeof groupFolderId !== 'undefined') {
-				data.groupFolderId = groupFolderId
+			const templateRepoId = props[ACL_PROPERTIES.GROUP_FOLDER_ID]
+			if (typeof templateRepoId !== 'undefined') {
+				data.templateRepoId = templateRepoId
 			}
 			const aclEnabled = props[ACL_PROPERTIES.PROPERTY_ACL_ENABLED]
 			if (typeof aclEnabled !== 'undefined') {
@@ -225,7 +225,7 @@ class AclDavService {
 					inheritedAclsById,
 					aclEnabled: fileInfo.aclEnabled,
 					aclCanManage: fileInfo.aclCanManage,
-					groupFolderId: fileInfo.groupFolderId,
+					templateRepoId: fileInfo.templateRepoId,
 				}
 			}
 			return null

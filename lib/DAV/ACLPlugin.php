@@ -21,13 +21,13 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\DAV;
+namespace OCA\TemplateRepo\DAV;
 
 use OCA\DAV\Connector\Sabre\Node;
-use OCA\GroupFolders\ACL\Rule;
-use OCA\GroupFolders\ACL\RuleManager;
-use OCA\GroupFolders\Folder\FolderManager;
-use OCA\GroupFolders\Mount\GroupMountPoint;
+use OCA\TemplateRepo\ACL\Rule;
+use OCA\TemplateRepo\ACL\RuleManager;
+use OCA\TemplateRepo\Folder\FolderManager;
+use OCA\TemplateRepo\Mount\GroupMountPoint;
 use OCP\Constants;
 use OCP\IUser;
 use OCP\IUserSession;
@@ -43,7 +43,7 @@ class ACLPlugin extends ServerPlugin {
 	public const ACL_CAN_MANAGE = '{http://nextcloud.org/ns}acl-can-manage';
 	public const ACL_LIST = '{http://nextcloud.org/ns}acl-list';
 	public const INHERITED_ACL_LIST = '{http://nextcloud.org/ns}inherited-acl-list';
-	public const GROUP_FOLDER_ID = '{http://nextcloud.org/ns}group-folder-id';
+	public const GROUP_FOLDER_ID = '{http://nextcloud.org/ns}template-repo-id';
 
 	private ?Server $server = null;
 	private RuleManager $ruleManager;

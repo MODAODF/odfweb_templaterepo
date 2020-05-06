@@ -21,7 +21,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command;
+namespace OCA\TemplateRepo\Command;
 
 use OCP\Files\FileInfo;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,8 +31,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Quota extends FolderCommand {
 	protected function configure() {
 		$this
-			->setName('groupfolders:quota')
-			->setDescription('Edit the quota of a configured group folder')
+			->setName('templaterepo:quota')
+			->setDescription('Edit the quota of a configured template repo')
 			->addArgument('folder_id', InputArgument::REQUIRED, 'Id of the folder to configure')
 			->addArgument('quota', InputArgument::REQUIRED, 'New value for the quota of the folder');
 		parent::configure();

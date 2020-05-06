@@ -2,8 +2,8 @@
 host = https://www.transifex.com
 lang_map = bg_BG: bg, cs_CZ: cs, fi_FI: fi, hu_HU: hu, nb_NO: nb, sk_SK: sk, th_TH: th, ja_JP: ja
 
-[nextcloud.groupfolders]
-file_filter = translationfiles/<lang>/groupfolders.po
-source_file = translationfiles/templates/groupfolders.pot
+[nextcloud.templaterepo]
+file_filter = translationfiles/<lang>/templaterepo.po
+source_file = translationfiles/templates/templaterepo.pot
 source_lang = en
 type = PO

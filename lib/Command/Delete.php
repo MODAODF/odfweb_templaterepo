@@ -21,7 +21,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Command;
+namespace OCA\TemplateRepo\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -32,8 +32,8 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class Delete extends FolderCommand {
 	protected function configure() {
 		$this
-			->setName('groupfolders:delete')
-			->setDescription('Delete group folder')
+			->setName('templaterepo:delete')
+			->setDescription('Delete template repo')
 			->addArgument('folder_id', InputArgument::REQUIRED, 'Id of the folder to rename')
 			->addOption('force', 'f', InputOption::VALUE_NONE, 'Skip confirmation');
 		parent::configure();
@@ -45,7 +45,7 @@ class Delete extends FolderCommand {
 			return -1;
 		}
 		$helper = $this->getHelper('question');
-		$question = new ConfirmationQuestion('Are you sure you want to delete the group folder ' . $folder['mount_point'] . ' and all files within, this cannot be undone (y/N).', false);
+		$question = new ConfirmationQuestion('Are you sure you want to delete the template repo ' . $folder['mount_point'] . ' and all files within, this cannot be undone (y/N).', false);
 		if ($input->getOption('force') || $helper->ask($input, $output, $question)) {
 			$folderMount = $this->mountProvider->getFolder($folder['id']);
 			$this->folderManager->removeFolder($folder['id']);

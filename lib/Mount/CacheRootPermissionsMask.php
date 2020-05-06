@@ -21,7 +21,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Mount;
+namespace OCA\TemplateRepo\Mount;
 
 use OC\Files\Cache\Wrapper\CacheWrapper;
 use OCP\Files\Cache\ICache;
@@ -36,7 +36,7 @@ class CacheRootPermissionsMask extends CacheWrapper {
 
 	protected function formatCacheEntry($entry) {
 		$path = $entry['path'];
-		$isRoot = $path === '' || (strpos($path, '__groupfolders') === 0 && count(explode('/', $path)) === 2);
+		$isRoot = $path === '' || (strpos($path, '__templaterepo') === 0 && count(explode('/', $path)) === 2);
 		if (isset($entry['permissions']) && $isRoot) {
 			$entry['scan_permissions'] = $entry['permissions'];
 			$entry['permissions'] &= $this->mask;

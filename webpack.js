@@ -10,8 +10,8 @@ webpackConfig.entry = {
 	],
 	files: [
 		'./src/files.js',
-		'./src/groupfoldersfilelist.js',
-		'./src/groupfoldersplugin.js'
+		'./src/templaterepofilelist.js',
+		'./src/templaterepoplugin.js'
 	]
 }
 

@@ -21,11 +21,11 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\groupfolders\tests\ACL;
+namespace OCA\templaterepo\tests\ACL;
 
 use OC\Files\Cache\CacheEntry;
-use OCA\GroupFolders\ACL\ACLCacheWrapper;
-use OCA\GroupFolders\ACL\ACLManager;
+use OCA\TemplateRepo\ACL\ACLCacheWrapper;
+use OCA\TemplateRepo\ACL\ACLManager;
 use OCP\Constants;
 use OCP\Files\Cache\ICache;
 use OCP\IDBConnection;

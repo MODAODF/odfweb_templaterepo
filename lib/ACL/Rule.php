@@ -21,10 +21,10 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\ACL;
+namespace OCA\TemplateRepo\ACL;
 
-use OCA\GroupFolders\ACL\UserMapping\IUserMapping;
-use OCA\GroupFolders\ACL\UserMapping\UserMapping;
+use OCA\TemplateRepo\ACL\UserMapping\IUserMapping;
+use OCA\TemplateRepo\ACL\UserMapping\UserMapping;
 use Sabre\Xml\Reader;
 use Sabre\Xml\Writer;
 use Sabre\Xml\XmlDeserializable;

@@ -19,7 +19,7 @@
  *
  */
 
-namespace OCA\GroupFolders\Mount;
+namespace OCA\TemplateRepo\Mount;
 
 use OC\Files\Mount\MountPoint;
 
@@ -52,6 +52,6 @@ class GroupMountPoint extends MountPoint {
 	}
 
 	public function getSourcePath(): string {
-		return '/__groupfolders/' . $this->getFolderId();
+		return '/__templaterepo/' . $this->getFolderId();
 	}
 }

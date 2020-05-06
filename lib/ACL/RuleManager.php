@@ -21,10 +21,10 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\ACL;
+namespace OCA\TemplateRepo\ACL;
 
-use OCA\GroupFolders\ACL\UserMapping\IUserMapping;
-use OCA\GroupFolders\ACL\UserMapping\IUserMappingManager;
+use OCA\TemplateRepo\ACL\UserMapping\IUserMapping;
+use OCA\TemplateRepo\ACL\UserMapping\IUserMappingManager;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
@@ -66,7 +66,7 @@ class RuleManager {
 
 		$query = $this->connection->getQueryBuilder();
 		$query->select(['fileid', 'mapping_type', 'mapping_id', 'mask', 'permissions'])
-			->from('group_folders_acl')
+			->from('template_repo_acl')
 			->where($query->expr()->in('fileid', $query->createNamedParameter($fileIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->andWhere($query->expr()->orX(...array_map(function (IUserMapping $userMapping) use ($query) {
 				return $query->expr()->andX(
@@ -107,7 +107,7 @@ class RuleManager {
 		foreach (array_chunk($hashes, 1000) as $chunk) {
 			$query = $this->connection->getQueryBuilder();
 			$query->select(['f.fileid', 'mapping_type', 'mapping_id', 'mask', 'a.permissions', 'path'])
-				->from('group_folders_acl', 'a')
+				->from('template_repo_acl', 'a')
 				->innerJoin('a', 'filecache', 'f', $query->expr()->eq('f.fileid', 'a.fileid'))
 				->where($query->expr()->in('path_hash', $query->createNamedParameter($chunk, IQueryBuilder::PARAM_STR_ARRAY)))
 				->andWhere($query->expr()->eq('storage', $query->createNamedParameter($storageId, IQueryBuilder::PARAM_INT)))
@@ -146,7 +146,7 @@ class RuleManager {
 		$query = $this->connection->getQueryBuilder();
 		$query->select(['f.fileid', 'mapping_type', 'mapping_id', 'mask', 'a.permissions', 'path'])
 			->from('filecache', 'f')
-			->leftJoin('f', 'group_folders_acl', 'a', $query->expr()->eq('f.fileid', 'a.fileid'))
+			->leftJoin('f', 'template_repo_acl', 'a', $query->expr()->eq('f.fileid', 'a.fileid'))
 			->andWhere($query->expr()->eq('parent', $query->createNamedParameter($parentId, IQueryBuilder::PARAM_INT)))
 			->andWhere(
 				$query->expr()->orX(
@@ -201,7 +201,7 @@ class RuleManager {
 		}, $filePaths);
 		$query = $this->connection->getQueryBuilder();
 		$query->select(['f.fileid', 'mapping_type', 'mapping_id', 'mask', 'a.permissions', 'path'])
-			->from('group_folders_acl', 'a')
+			->from('template_repo_acl', 'a')
 			->innerJoin('a', 'filecache', 'f', $query->expr()->eq('f.fileid', 'a.fileid'))
 			->where($query->expr()->in('path_hash', $query->createNamedParameter($hashes, IQueryBuilder::PARAM_STR_ARRAY)))
 			->andWhere($query->expr()->eq('storage', $query->createNamedParameter($storageId, IQueryBuilder::PARAM_INT)));
@@ -232,7 +232,7 @@ class RuleManager {
 	public function getAllRulesForPrefix(int $storageId, string $prefix): array {
 		$query = $this->connection->getQueryBuilder();
 		$query->select(['f.fileid', 'mapping_type', 'mapping_id', 'mask', 'a.permissions', 'path'])
-			->from('group_folders_acl', 'a')
+			->from('template_repo_acl', 'a')
 			->innerJoin('a', 'filecache', 'f', $query->expr()->eq('f.fileid', 'a.fileid'))
 			->where($query->expr()->orX(
 				$query->expr()->like('path', $query->createNamedParameter($this->connection->escapeLikeParameter($prefix) . '/%')),
@@ -256,7 +256,7 @@ class RuleManager {
 
 		$query = $this->connection->getQueryBuilder();
 		$query->select(['f.fileid', 'mapping_type', 'mapping_id', 'mask', 'a.permissions', 'path'])
-			->from('group_folders_acl', 'a')
+			->from('template_repo_acl', 'a')
 			->innerJoin('a', 'filecache', 'f', $query->expr()->eq('f.fileid', 'a.fileid'))
 			->where($query->expr()->orX(
 				$query->expr()->like('path', $query->createNamedParameter($this->connection->escapeLikeParameter($prefix) . '/%')),
@@ -278,7 +278,7 @@ class RuleManager {
 	private function hasRule(IUserMapping $mapping, int $fileId): bool {
 		$query = $this->connection->getQueryBuilder();
 		$query->select('fileid')
-			->from('group_folders_acl')
+			->from('template_repo_acl')
 			->where($query->expr()->eq('fileid', $query->createNamedParameter($fileId, IQueryBuilder::PARAM_INT)))
 			->andWhere($query->expr()->eq('mapping_type', $query->createNamedParameter($mapping->getType())))
 			->andWhere($query->expr()->eq('mapping_id', $query->createNamedParameter($mapping->getId())));
@@ -288,7 +288,7 @@ class RuleManager {
 	public function saveRule(Rule $rule): void {
 		if ($this->hasRule($rule->getUserMapping(), $rule->getFileId())) {
 			$query = $this->connection->getQueryBuilder();
-			$query->update('group_folders_acl')
+			$query->update('template_repo_acl')
 				->set('mask', $query->createNamedParameter($rule->getMask(), IQueryBuilder::PARAM_INT))
 				->set('permissions', $query->createNamedParameter($rule->getPermissions(), IQueryBuilder::PARAM_INT))
 				->where($query->expr()->eq('fileid', $query->createNamedParameter($rule->getFileId(), IQueryBuilder::PARAM_INT)))
@@ -317,7 +317,7 @@ class RuleManager {
 			$this->eventDispatcher->dispatchTyped(new CriticalActionPerformedEvent($logMessage, $params));
 		} else {
 			$query = $this->connection->getQueryBuilder();
-			$query->insert('group_folders_acl')
+			$query->insert('template_repo_acl')
 				->values([
 					'fileid' => $query->createNamedParameter($rule->getFileId(), IQueryBuilder::PARAM_INT),
 					'mapping_type' => $query->createNamedParameter($rule->getUserMapping()->getType()),
@@ -351,7 +351,7 @@ class RuleManager {
 
 	public function deleteRule(Rule $rule): void {
 		$query = $this->connection->getQueryBuilder();
-		$query->delete('group_folders_acl')
+		$query->delete('template_repo_acl')
 			->where($query->expr()->eq('fileid', $query->createNamedParameter($rule->getFileId(), IQueryBuilder::PARAM_INT)))
 			->andWhere($query->expr()->eq('mapping_type', $query->createNamedParameter($rule->getUserMapping()->getType())))
 			->andWhere($query->expr()->eq('mapping_id', $query->createNamedParameter($rule->getUserMapping()->getId())));
