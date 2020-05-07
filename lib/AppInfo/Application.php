@@ -44,12 +44,14 @@ use OCA\TemplateRepo\Trash\TrashBackend;
 use OCA\TemplateRepo\Trash\TrashManager;
 use OCA\TemplateRepo\Versions\GroupVersionsExpireManager;
 use OCA\TemplateRepo\Versions\VersionsBackend;
+use OCA\TemplateRepo\Notification\Notifier;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\AppFramework\IAppContainer;
 use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\Files\NotFoundException;
 use OCP\Files\Config\IMountProviderCollection;
 use OCP\ICacheFactory;
 use OCP\IDBConnection;
@@ -197,19 +199,51 @@ class Application extends App implements IBootstrap {
 			$cacheListener->listen();
 
 			/** @var IGroupManager|Manager $groupManager */
+			/** 註冊檔案 upload 同步 */
 			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
 			$rootfolder->listen('\OC\Files', 'postCreate', function ($k) {
-				if ($k->getFileInfo()->getMountPoint()->getMountType() == "templaterepo") {
-					$filePath = $k->getFileInfo()->getInternalPath();
-					$fileType = $k->getFileInfo()->getMimetype();
-					$fileName = $k->getFileInfo()->getName();
-					$fileExt = $k->getFileInfo()->getExtension();
-					$folderId = $k->getFileInfo()->getMountPoint()->getFolderId();
-					$api_server = $this->getFolderManager()->getAPIServer($folderId);
-					$file_content = $k->getFileInfo()->getStorage()->file_get_contents($filePath);
-					$this->uploadFile($api_server, $file_content, $fileType, $fileName, $fileExt);
+				$fileInfo = $k->getFileInfo();
+				if (
+					$fileInfo->getMountPoint()->getMountType() == "templaterepo" &&
+					$fileInfo->getData()->getData()['type'] == "file"
+				) {
+					$this->uploadFile($fileInfo);
 				}
 			});
+
+			/** 註冊檔案 delete 同步 */
+			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
+			$rootfolder->listen('\OC\Files', 'postDelete', function ($k) {
+				$fileInfo = $k->getFileInfo();
+				if (
+					$fileInfo->getMountPoint()->getMountType() == "templaterepo" &&
+					$fileInfo->getData()->getData()['type'] == "file"
+				) {
+					$this->deleteFile($fileInfo);
+				}
+			});
+
+			/** 註冊檔案 update 同步 */
+			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
+			$rootfolder->listen('\OC\Files', 'postWrite', function ($k) {
+				$fileInfo = $k->getFileInfo();
+				if (
+					$fileInfo->getMountPoint()->getMountType() == "templaterepo" &&
+					$fileInfo->getData()->getData()['type'] == "file"
+				) {
+					$this->updateFile($fileInfo);
+				}
+			});
+
+			// 註冊檔案上傳提醒
+			$this->getContainer()->getServer()->getNotificationManager()->registerNotifier(
+				function () {
+					return $this->getContainer()->query(Notifier::class);
+				},
+				function () {
+					return ['id' => 'templaterepo', 'name' => "templaterepo"];
+				}
+			);
 		});
 
 		\OCA\Files\App::getNavigationManager()->add([
@@ -230,15 +264,29 @@ class Application extends App implements IBootstrap {
 		return $this->getContainer()->get(FolderManager::class);
 	}
 
-	private function uploadFile($api_server, $file_content, $fileType, $fileName, $fileExt)	{
-		$url = "https://" . $api_server . "/lool/templaterepo/upload";
+	private function uploadFile(\OC\Files\FileInfo $fileInfo) {
+		$filePath = $fileInfo->getInternalPath();
+		$fileType = $fileInfo->getMimetype();
+		$fileName = $fileInfo->getName();
+		$fileExt = $fileInfo->getExtension();
+		$folderId = $fileInfo->getMountPoint()->getFolderId(); // getFolderId is in TemplateRepo's GroupMounPoint
+		$file_content = $fileInfo->getStorage()->file_get_contents($filePath);
+		$api_server = $this->getFolderManager()->getAPIServer($folderId);
+		$path_hash  = $fileInfo->getData()->getData()['path_hash'];
+		$mtime  = $fileInfo->getData()->getData()['mtime'];
+		$cid = $fileInfo->getMountPoint()->getMountPoint();
+		$cid = explode("/", $cid)[3];
+
+		$url = $api_server . "/lool/templaterepo/upload";
 		$tmph = tmpfile();
 		fwrite($tmph, $file_content);
 		$tmpf = stream_get_meta_data($tmph)['uri'];
 		$fields = array(
-			'endpt' => $fileName,
+			'endpt' => $path_hash,
 			'filename' => curl_file_create($tmpf, $fileType, $fileName),
-			'extname' => $fileExt
+			'extname' => $fileExt,
+			'cid' => $cid,
+			'uptime' => strval($mtime)
 		);
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_POST, true);
@@ -251,23 +299,95 @@ class Application extends App implements IBootstrap {
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		if ($httpCode != 200) {
-			$manager = $this->getContainer()->getServer()->getNotificationManager();
-			$notification = $manager->createNotification();
-			$acceptAction = $notification->createAction();
-			$acceptAction->setLabel('accept')->setLink('remote_shares', 'POST');
-
-			$declineAction = $notification->createAction();
-			$declineAction->setLabel('decline')->setLink('remote_shares', 'DELETE');
-
-			$notification->setApp('templaterepo')
-				->setUser('admin')
-				->setDateTime(new \DateTime())
-				->setObject('remote', '1337') // $type and $id
-				->setSubject('remote_share', ['name' => '/fancyFolder']) // $subject and $parameters
-				->addAction($acceptAction)
-				->addAction($declineAction);
-			$manager->notify($notification);
+			$this->notify("upload-fail", $fileName, "admin");
+		} else {
+			$this->notify("upload-success", $fileName, "admin");
 		}
 		curl_close($curl);
+	}
+
+	private function deleteFile(\OC\Files\FileInfo $fileInfo) {
+		$fileExt = $fileInfo->getExtension();
+		$folderId = $fileInfo->getMountPoint()->getFolderId(); // etFolderId is in TemplateRepo's GroupMounPoint
+		$fileName = $fileInfo->getName();
+		$api_server = $this->getFolderManager()->getAPIServer($folderId);
+		$path_hash  = $fileInfo->getData()->getData()['path_hash'];
+
+		$url = $api_server . "/lool/templaterepo/delete";
+		$fields = array(
+			'endpt' => $path_hash,
+			'extname' => $fileExt,
+		);
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+		$response = curl_exec($curl);
+		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		if ($httpCode != 200) {
+			$this->notify("delete-fail", $fileName, "admin");
+		} else {
+			$this->notify("delete-success", $fileName, "admin");
+		}
+		curl_close($curl);
+	}
+
+	private function updateFile(\OC\Files\FileInfo $fileInfo) {
+		// 要對新創和覆蓋的作區別, 可能要棄用 filesystem's hook 改用 Sabre/ACLPlugin 的 afterWriteContent 來處理後續更新的方式
+		// Hook 的入口有很多不同點, 開發上需要多注意細節
+		$filePath = $fileInfo->getInternalPath();
+		$fileType = $fileInfo->getMimetype();
+		$fileName = $fileInfo->getName();
+		$fileExt = $fileInfo->getExtension();
+		$folderId = $fileInfo->getMountPoint()->getFolderId(); // getFolderId is in TemplateRepo's GroupMounPoint
+		$file_content = $fileInfo->getStorage()->file_get_contents($filePath);
+		$api_server = $this->getFolderManager()->getAPIServer($folderId);
+		$path_hash  = $fileInfo->getData()->getData()['path_hash'];
+		$mtime  = $fileInfo->getData()->getData()['mtime'];
+		$cid = $fileInfo->getMountPoint()->getMountPoint();
+		$cid = explode("/", $cid)[3];
+
+		$url = $api_server . "/lool/templaterepo/update";
+		$tmph = tmpfile();
+		fwrite($tmph, $file_content);
+		$tmpf = stream_get_meta_data($tmph)['uri'];
+		$fields = array(
+			'endpt' => $path_hash,
+			'filename' => curl_file_create($tmpf, $fileType, $fileName),
+			'extname' => $fileExt,
+			'cid' => $cid,
+			'uptime' => strval($mtime)
+		);
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+		$response = curl_exec($curl);
+		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		if ($httpCode != 200) {
+			$this->notify("update-fail", $fileName, "admin");
+		} else {
+			$this->notify("update-success", $fileName, "admin");
+		}
+		curl_close($curl);
+	}
+
+	private function notify(string $type, string $filename, $user) {
+		$manager = $this->getContainer()->getServer()->getNotificationManager();
+		$notification = $manager->createNotification();
+		$notification->setApp('templaterepo')
+			->setUser($user)
+			->setDateTime(new \DateTime())
+			->setObject('templaterepo', '1') // $type and $id
+			->setSubject($type, ['filename' => $filename, 'user' => $user]);
+		$manager->notify($notification);
 	}
 }
