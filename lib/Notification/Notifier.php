@@ -1,8 +1,10 @@
 <?php
 
-namespace OCA\TemplateRepo\Notifier;
+namespace OCA\TemplateRepo\Notification;
 
-class Notifier implements \OCP\Notification\INotifier {
+use OCP\Notification\INotifier;
+
+class Notifier implements INotifier {
     protected $factory;
     protected $url;
 
@@ -12,15 +14,73 @@ class Notifier implements \OCP\Notification\INotifier {
 
     public function prepare(\OCP\Notification\INotification $notification, $languageCode)
     {
-        if ($notification->getApp() !== 'files_sharing') {
+        if ($notification->getApp() !== 'templaterepo') {
             // Not my app => throw
             throw new \InvalidArgumentException();
         }
         // Read the language from the notification
-        $l = $this->factory->get('files_sharing', $languageCode);
+        $parameters = $notification->getSubjectParameters();
         switch ($notification->getSubject()) {
-            case 'remote_share':
-                $x = 1;
+            case 'upload-success':
+                $subject = "TemplateRepo";
+                $subjectParameters = [];
+                $message = $parameters['filename'] . " 遠端同步成功";
+                $messageParameters = [];
+                $notification->setRichSubject($subject, $subjectParameters)
+                    ->setParsedSubject($subject)
+                    ->setRichMessage($message, $messageParameters)
+                    ->setParsedMessage($message);
+                return $notification;
+            case 'upload-fail':
+                $subject = "TemplateRepo";
+                $subjectParameters = [];
+                $message = $parameters['filename'] . " 遠端同步失敗";
+                $messageParameters = [];
+                $notification->setRichSubject($subject, $subjectParameters)
+                    ->setParsedSubject($subject)
+                    ->setRichMessage($message, $messageParameters)
+                    ->setParsedMessage($message);
+                return $notification;
+            case 'delete-success':
+                $subject = "TemplateRepo";
+                $subjectParameters = [];
+                $message = $parameters['filename'] . " 遠端刪除成功";
+                $messageParameters = [];
+                $notification->setRichSubject($subject, $subjectParameters)
+                    ->setParsedSubject($subject)
+                    ->setRichMessage($message, $messageParameters)
+                    ->setParsedMessage($message);
+                return $notification;
+            case 'delete-fail':
+                $subject = "TemplateRepo";
+                $subjectParameters = [];
+                $message = $parameters['filename'] . " 遠端刪除失敗";
+                $messageParameters = [];
+                $notification->setRichSubject($subject, $subjectParameters)
+                    ->setParsedSubject($subject)
+                    ->setRichMessage($message, $messageParameters)
+                    ->setParsedMessage($message);
+                return $notification;
+            case 'update-success':
+                $subject = "TemplateRepo";
+                $subjectParameters = [];
+                $message = $parameters['filename'] . " 遠端更新成功";
+                $messageParameters = [];
+                $notification->setRichSubject($subject, $subjectParameters)
+                    ->setParsedSubject($subject)
+                    ->setRichMessage($message, $messageParameters)
+                    ->setParsedMessage($message);
+                return $notification;
+            case 'update-fail':
+                $subject = "TemplateRepo";
+                $subjectParameters = [];
+                $message = $parameters['filename'] . " 遠端更新失敗";
+                $messageParameters = [];
+                $notification->setRichSubject($subject, $subjectParameters)
+                    ->setParsedSubject($subject)
+                    ->setRichMessage($message, $messageParameters)
+                    ->setParsedMessage($message);
+                return $notification;
             default:
                 return $notification;
         }
