@@ -62,6 +62,9 @@ use OCP\IRequest;
 use OCP\ISession;
 use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
+use OCP\Util;
+use OCP\Files\Node;
+use OC\Files\Filesystem;
 
 class Application extends App implements IBootstrap {
 	public function __construct(array $urlParams = []) {
@@ -223,13 +226,28 @@ class Application extends App implements IBootstrap {
 				}
 			});
 
+			/*	Update 可以註冊的 Hook (非官方提供的 Hook, 必須自己接)
+					OC_Filesystem:
+						pre_create
+						pre_update
+						pre_write
+						post_create
+						post_update
+						post_write
+					Sabre/DAV/Server/Hook:
+						beforeWriteContent
+						afterWriteContent
+
+				**這裡採用 post_update**
+			*/
+			Util::connectHook('OC_Filesystem', 'post_update', $this, 'postUpdate');
+
 			/** 註冊檔案 update 同步 */
 			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
-			$rootfolder->listen('\OC\Files', 'postWrite', function ($k) {
-				$fileInfo = $k->getFileInfo();
+			$rootfolder->listen('\OC\Files', 'postUpdate', function ($k) {
+				$fileInfo = $k;
 				if (
-					$fileInfo->getMountPoint()->getMountType() == "templaterepo" &&
-					$fileInfo->getData()->getData()['type'] == "file"
+					$fileInfo->getMountPoint()->getMountType() == "templaterepo"
 				) {
 					$this->updateFile($fileInfo);
 				}
@@ -262,6 +280,11 @@ class Application extends App implements IBootstrap {
 
 	public function getFolderManager(): FolderManager {
 		return $this->getContainer()->get(FolderManager::class);
+	}
+
+	public function postUpdate($arguments) {
+		$info = Filesystem::getView()->getFileInfo($arguments['path']);
+		$this->getContainer()->getServer()->getRootFolder()->emit('\OC\Files', 'postUpdate', [$info]);
 	}
 
 	private function uploadFile(\OC\Files\FileInfo $fileInfo) {
@@ -337,8 +360,6 @@ class Application extends App implements IBootstrap {
 	}
 
 	private function updateFile(\OC\Files\FileInfo $fileInfo) {
-		// 要對新創和覆蓋的作區別, 可能要棄用 filesystem's hook 改用 Sabre/ACLPlugin 的 afterWriteContent 來處理後續更新的方式
-		// Hook 的入口有很多不同點, 開發上需要多注意細節
 		$filePath = $fileInfo->getInternalPath();
 		$fileType = $fileInfo->getMimetype();
 		$fileName = $fileInfo->getName();
