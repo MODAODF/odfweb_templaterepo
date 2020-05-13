@@ -299,6 +299,7 @@ class Application extends App implements IBootstrap {
 		$mtime  = $fileInfo->getData()->getData()['mtime'];
 		$cid = $fileInfo->getMountPoint()->getMountPoint();
 		$cid = explode("/", $cid)[3];
+		$baseName = str_replace(".".$fileExt,"",$fileName);
 
 		$url = $api_server . "/lool/templaterepo/upload";
 		$tmph = tmpfile();
@@ -308,7 +309,8 @@ class Application extends App implements IBootstrap {
 			'endpt' => $path_hash,
 			'filename' => curl_file_create($tmpf, $fileType, $fileName),
 			'extname' => $fileExt,
-			'cid' => $cid,
+			'cname' => $cid,
+			'docname' => $baseName,
 			'uptime' => strval($mtime)
 		);
 		$curl = curl_init();
