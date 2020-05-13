@@ -397,7 +397,7 @@ function ManageAclSelect({ onChange, onSearch, folder }: ManageAclSelectProps) {
     }
 
     const typeLabel = (item) => {
-        return item.type === 'user' ? 'User' : 'Group'
+        return item.type === 'user' ? t('templaterepo', 'User') : t('templaterepo', 'Group')
     }
     return <AsyncSelect
         loadOptions={handleSearch}
