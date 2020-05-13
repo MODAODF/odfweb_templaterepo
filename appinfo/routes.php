@@ -97,5 +97,10 @@ return ['routes' => [
 		'name' => 'Folder#setAPIServer',
 		'url' => '/folders/{id}/apiserver',
 		'verb' => 'POST'
+	],
+	[
+		'name' => 'Folder#getFolderList',
+		'url' => '/folderlist',
+		'verb' => 'GET'
 	]
 ]];

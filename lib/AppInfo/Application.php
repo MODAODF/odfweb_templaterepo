@@ -269,7 +269,7 @@ class Application extends App implements IBootstrap {
 			'appname' => 'templaterepo',
 			'script' => 'list.php',
 			'order' => 25,
-			'name' => "群組資料夾",
+			'name' => "範本中心",
 			'icon' => "templaterepo"
 		]);
 	}

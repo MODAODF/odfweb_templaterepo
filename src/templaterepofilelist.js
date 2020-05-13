@@ -42,7 +42,13 @@ $(document).ready(function () {
 						return;
 					}
 					OC.Plugins.attach('OCA.Files.TemplateRepoFileList', this);
-
+					$.ajax({
+						url: OC.generateUrl('/apps/templaterepo/folderlist'),
+						type: 'GET',
+						dataType: 'json'
+					}).done(() => {
+						console.log("ffffff");
+					});
 				},
 
 				updateEmptyContent: function () {
@@ -94,6 +100,17 @@ $(document).ready(function () {
 					}
 					return false;
 
+					files = result.files;
+					result = [];
+					files.forEach((data)=>{
+						result.push(OC.Files.FileInfo(data));
+					});
+					if (result) {
+						// prepend empty dir info because original handler
+						result.unshift({});
+					}
+					status = 207; // Fake propFind success status
+					return OCA.Files.FileList.prototype.reloadCallback.call(this, status, result);
 				},
 			});
 
