@@ -111,7 +111,7 @@ interface UserSelectProps {
 function UserSelect({ allUsers, onChange }: UserSelectProps) {
 	if (allUsers.length === 0) {
 		return <div>
-			<p>No other users available</p>
+			<p>{t('groupfolders', 'No other users available')}</p>
 		</div>;
 	}
 	const options = allUsers.map(user => {
