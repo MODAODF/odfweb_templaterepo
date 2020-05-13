@@ -65,10 +65,10 @@ export function FolderGroups({groups, allGroups = [], onAddGroup, removeGroup, e
 					  onClick={event => event.stopPropagation()}>
 			<thead>
 			<tr>
-				<th>Group</th>
-				<th>Write</th>
-				<th>Share</th>
-				<th>Delete</th>
+				<th>{t('groupfolders', 'Group')}</th>
+				<th>{t('groupfolders', 'Write')}</th>
+				<th>{t('groupfolders', 'Share')}</th>
+				<th>{t('groupfolders', 'Delete')}</th>
 				<th/>
 			</tr>
 			</thead>
@@ -86,7 +86,7 @@ export function FolderGroups({groups, allGroups = [], onAddGroup, removeGroup, e
 	} else {
 		if (Object.keys(groups).length === 0) {
 			return <span>
-				<em>none</em>
+				<em>無</em>
 				<a className="icon icon-rename" onClick={showEdit}/>
 			</span>
 		}

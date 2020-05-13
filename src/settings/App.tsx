@@ -16,7 +16,7 @@ const defaultQuotaOptions = {
 	'1 GB': 1073741274,
 	'5 GB': 5368709120,
 	'10 GB': 10737412742,
-	'Unlimited': -3
+	'無限制': -3
 };
 
 export type SortKey = 'mount_point' | 'quota' | 'groups' | 'acl';
@@ -384,7 +384,7 @@ function ManageAclSelect({onChange, onSearch, folder}: ManageAclSelectProps) {
 	}
 
 	const typeLabel = (item) => {
-		return item.type === 'user' ? 'User' : 'Group'
+		return item.type === 'user' ? t('groupfolders', 'User') : t('groupfolders', 'Group')
 	}
 	return <AsyncSelect
 		loadOptions={handleSearch}
