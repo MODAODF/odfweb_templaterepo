@@ -109,7 +109,7 @@ interface AdminGroupSelectProps {
 function AdminGroupSelect({allGroups, onChange}: AdminGroupSelectProps) {
 	if (allGroups.length === 0) {
 		return <div className="no-options-available">
-			<p>No other groups available</p>
+			<p>{t('groupfolders', 'No other groups available')}</p>
 		</div>;
 	}
 	const options = allGroups.map(group => {
