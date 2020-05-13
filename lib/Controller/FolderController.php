@@ -27,6 +27,8 @@ use OCA\GroupFolders\Mount\MountProvider;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCSController;
 use OCP\Files\IRootFolder;
+use OC\Files\Filesystem;
+use OC\Files\Node\Node;
 use OCP\IRequest;
 use OCP\IUserSession;
 use OCP\IUser;
@@ -238,5 +240,64 @@ class FolderController extends OCSController {
 			'users' => $users,
 			'groups' => $groups,
 		]);
+	}
+
+	/**
+	 * @param \OCP\Files\Node[] $nodes
+	 * @return array
+	 */
+	private function formatNodes(array $nodes) {
+		return array_values(array_map(function (Node $node) {
+			/** @var \OC\Files\Node\Node $shareTypes */
+			$shareTypes = [0];
+			$file = \OCA\Files\Helper::formatFileInfo($node->getFileInfo());
+			$parts = explode('/', $node->getPath());
+			if (isset($parts[4])) {
+				$file['path'] = '/' . $parts[4];
+			} else {
+				$file['path'] = '/';
+			}
+			if (!empty($shareTypes)) {
+				$file['shareTypes'] = $shareTypes;
+			}
+			$templateFormatFile = array(
+				"id" => strval($file['id']),
+				"parentId" => strval($file['parentId']),
+				"permissions" => $file['permissions'],
+				"mimetype" => $file['mimetype'],
+				"name" => $parts[3],
+				"size" => $file['size'],
+				"type" => "dir",
+				"etag" => $file['etag'],
+				"path" => $file['path'],
+				"mtime" => $file['mtime'],
+				"mountType" => "group"
+
+			);
+			return $templateFormatFile;
+		}, $nodes));
+	}
+
+
+	public function getFolderList()
+	{
+		$x=1;
+		$mounts  = $this->rootFolder->getMountsIn("");
+		$mounts = array_filter($mounts, function($mount){
+			if($mount->getMountType() == "group")
+				return True;
+			else
+				return False;
+		});
+
+		$nodes = array_map(function($mount){
+			$path = $mount->getMountPoint();
+			$info = Filesystem::getView()->getFileInfo($path);
+			$node =  $this->rootFolder->get($path);
+			return $node;
+		}, $mounts);
+
+		$files = $this->formatNodes($nodes);
+		return new JSONResponse(['files' => $files]);
 	}
 }

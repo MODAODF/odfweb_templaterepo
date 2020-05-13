@@ -85,6 +85,11 @@ return ['routes' => [
 		'verb' => 'GET'
 	],
 	[
+		'name' => 'Folder#getFolderList',
+		'url' => '/folderlist',
+		'verb' => 'GET'
+	],
+	[
 		'name' => 'Delegation#getAllGroups',
 		'url' => 'delegation/groups',
 		'verb' => 'GET'

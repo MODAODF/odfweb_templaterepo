@@ -196,6 +196,15 @@ class Application extends App implements IBootstrap {
 			});
 			$cacheListener->listen();
 		});
+
+		\OCA\Files\App::getNavigationManager()->add([
+			'id' => 'groupfolderslist',
+			'appname' => 'groupfolders',
+			'script' => 'list.php',
+			'order' => 25,
+			'name' => "群組資料夾",
+			'icon' => "groupfolders"
+		]);
 	}
 
 	public function getMountProvider(): MountProvider {
