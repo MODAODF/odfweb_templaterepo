@@ -204,6 +204,18 @@ class Application extends App implements IBootstrap {
 			/** @var IGroupManager|Manager $groupManager */
 			/** 註冊檔案 upload 同步 */
 			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
+
+			/** 禁止創造子資料夾 */
+			$rootfolder->listen('\OC\Files', 'preCreate', function ($k) {
+				$method = \OC::$server->getRequest()->getMethod();
+				$mount_type = $k->getParent()->getFileInfo()->getMountPoint()->getMountType();
+				if ($method == "MKCOL" && $mount_type == "templaterepo") {
+					throw new \OC\ServerNotAvailableException;
+				}
+			});
+
+
+			/** 註冊檔案 upload 同步 */
 			$rootfolder->listen('\OC\Files', 'postCreate', function ($k) {
 				$fileInfo = $k->getFileInfo();
 				if (
@@ -215,7 +227,6 @@ class Application extends App implements IBootstrap {
 			});
 
 			/** 註冊檔案 delete 同步 */
-			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
 			$rootfolder->listen('\OC\Files', 'postDelete', function ($k) {
 				$fileInfo = $k->getFileInfo();
 				if (
@@ -243,7 +254,6 @@ class Application extends App implements IBootstrap {
 			Util::connectHook('OC_Filesystem', 'post_update', $this, 'postUpdate');
 
 			/** 註冊檔案 update 同步 */
-			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
 			$rootfolder->listen('\OC\Files', 'postUpdate', function ($k) {
 				$fileInfo = $k;
 				if (
@@ -299,7 +309,7 @@ class Application extends App implements IBootstrap {
 		$mtime  = $fileInfo->getData()->getData()['mtime'];
 		$cid = $fileInfo->getMountPoint()->getMountPoint();
 		$cid = explode("/", $cid)[3];
-		$baseName = str_replace(".".$fileExt,"",$fileName);
+		$baseName = str_replace("." . $fileExt, "", $fileName);
 
 		$url = $api_server . "/lool/templaterepo/upload";
 		$tmph = tmpfile();
@@ -324,9 +334,9 @@ class Application extends App implements IBootstrap {
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		if ($httpCode != 200) {
-			$this->notify("upload-fail", $fileName, "admin");
+			$this->notify("upload-fail", $fileName);
 		} else {
-			$this->notify("upload-success", $fileName, "admin");
+			$this->notify("upload-success", $fileName);
 		}
 		curl_close($curl);
 	}
@@ -354,9 +364,9 @@ class Application extends App implements IBootstrap {
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		if ($httpCode != 200) {
-			$this->notify("delete-fail", $fileName, "admin");
+			$this->notify("delete-fail", $fileName);
 		} else {
-			$this->notify("delete-success", $fileName, "admin");
+			$this->notify("delete-success", $fileName);
 		}
 		curl_close($curl);
 	}
@@ -396,14 +406,15 @@ class Application extends App implements IBootstrap {
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		if ($httpCode != 200) {
-			$this->notify("update-fail", $fileName, "admin");
+			$this->notify("update-fail", $fileName);
 		} else {
-			$this->notify("update-success", $fileName, "admin");
+			$this->notify("update-success", $fileName);
 		}
 		curl_close($curl);
 	}
 
-	private function notify(string $type, string $filename, $user) {
+	private function notify(string $type, string $filename) {
+		$user = $this->getContainer()->getServer()->getSession()->get('user_id');
 		$manager = $this->getContainer()->getServer()->getNotificationManager();
 		$notification = $manager->createNotification();
 		$notification->setApp('templaterepo')
