@@ -114,6 +114,13 @@ export class Api {
 		});
 	}
 
+	syncFolder(id: number): Thenable<void> {
+		return $.ajax({
+			url: this.getUrl(`syncfolder/${id}`),
+			type: 'GET'
+		});
+	}
+
 	addGroup(folderId: number, group: string): Thenable<void> {
 		return $.post(this.getUrl(`folders/${folderId}/groups`), {
 			group
