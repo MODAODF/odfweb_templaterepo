@@ -79,6 +79,8 @@ class ACLPlugin extends ServerPlugin {
 		// 這裡可以註冊的方法請參考 sabre 的 event
 		// https://sabre.io/dav/writing-plugins/
 		$this->server->on('afterMethod', [$this, 'afterMethod']);
+		//beforeMethod 不會被呼叫，因為這邊的 hook 會在方法執行期間才被注入
+		$this->server->on('beforeMethod', [$this, 'afterMethod']);
 
 		$this->server->xml->elementMap[Rule::ACL] = Rule::class;
 		$this->server->xml->elementMap[self::ACL_LIST] = function (Reader $reader): array {

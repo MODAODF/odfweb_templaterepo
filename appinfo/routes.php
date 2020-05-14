@@ -102,5 +102,10 @@ return ['routes' => [
 		'name' => 'Folder#getFolderList',
 		'url' => '/folderlist',
 		'verb' => 'GET'
+	],
+	[
+		'name' => 'Folder#syncFolder',
+		'url' => '/syncfolder/{id}',
+		'verb' => 'GET'
 	]
 ]];

@@ -836,4 +836,21 @@ class FolderManager {
 
 		return $permissions;
 	}
+
+	public function getMountPointById($folderId)
+	{
+		$query = $this->connection->getQueryBuilder();
+		$query->select('mount_point')
+			->from('template_repo')
+			->where($query->expr()->eq('folder_id', $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT)));
+
+		$rows = $query->execute()->fetchAll();
+
+		$mount_point = "";
+		foreach ($rows as $row) {
+			$mount_point = $row['mount_point'];
+		}
+
+		return $mount_point;
+	}
 }

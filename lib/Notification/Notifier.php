@@ -81,6 +81,26 @@ class Notifier implements INotifier {
                     ->setRichMessage($message, $messageParameters)
                     ->setParsedMessage($message);
                 return $notification;
+            case 'sync-success':
+                $subject = "TemplateRepo";
+                $subjectParameters = [];
+                $message = "[SYSTEM] ".$parameters['filename'] . " 同步成功";
+                $messageParameters = [];
+                $notification->setRichSubject($subject, $subjectParameters)
+                    ->setParsedSubject($subject)
+                    ->setRichMessage($message, $messageParameters)
+                    ->setParsedMessage($message);
+                return $notification;
+            case 'sync-fail':
+                $subject = "TemplateRepo";
+                $subjectParameters = [];
+                $message = "[SYSTEM] ".$parameters['filename'] . " 同步失敗";
+                $messageParameters = [];
+                $notification->setRichSubject($subject, $subjectParameters)
+                    ->setParsedSubject($subject)
+                    ->setRichMessage($message, $messageParameters)
+                    ->setParsedMessage($message);
+                return $notification;
             default:
                 return $notification;
         }

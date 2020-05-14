@@ -59,17 +59,31 @@
 		}
 
 		&.mountpoint {
-			width: 15%;
+			width: 10%;
 		}
 		&.groups {
-			min-width: 300px;
+			min-width: 50px;
 			white-space: normal;
 		}
 		&.quota {
 			width: 180px;
 		}
+		&.acl {
+			display: flex;
+			& > div {
+				min-width: 150px;
+				flex-grow: 1;
+			}
+			& > label {
+				padding-top: 10px;
+			}
+		}
 
 		&.remove {
+			width: 32px;
+		}
+
+		&.sync {
 			width: 32px;
 		}
 
@@ -110,7 +124,7 @@
 	.newgroup-name {
 		margin-left: 10px;
 		margin-right: 20px;
-		width: 200px;
+		width: 100px;
 		max-width: calc(100% - 40px);
 	}
 }

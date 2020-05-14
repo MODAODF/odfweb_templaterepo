@@ -312,7 +312,8 @@ class FolderController extends OCSController {
 	 * @param \OCP\Files\Node[] $nodes
 	 * @return array
 	 */
-	private function formatNodes(array $nodes) {
+	private function formatNodes(array $nodes)
+	{
 		return array_values(array_map(function (Node $node) {
 			/** @var \OC\Files\Node\Node $shareTypes */
 			$shareTypes = [0];
@@ -345,7 +346,7 @@ class FolderController extends OCSController {
 	}
 
 	public function getFolderList()	{
-		$x=1;
+		$x = 1;
 		$mounts  = $this->rootFolder->getMountsIn("");
 		$mounts = array_filter($mounts, function($mount){
 			if($mount->getMountType() == "templaterepo")
@@ -354,7 +355,7 @@ class FolderController extends OCSController {
 				return False;
 		});
 
-		$nodes = array_map(function($mount){
+		$nodes = array_map(function ($mount) {
 			$path = $mount->getMountPoint();
 			$info = Filesystem::getView()->getFileInfo($path);
 			$node =  $this->rootFolder->get($path);
@@ -363,6 +364,153 @@ class FolderController extends OCSController {
 
 		$files = $this->formatNodes($nodes);
 		return new JSONResponse(['files' => $files]);
+	}
+
+	public function syncFolder($id)
+	{
+		$api_server = $this->manager->getAPIServer($id);
+		$url = $api_server . "/lool/templaterepo/list";
+
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+		$res = curl_exec($curl);
+		$serverList = json_decode($res);
+		$folder = $this->mountProvider->getFolder($id, false);
+		$dirList = $folder->getDirectoryListing();
+
+		$mount_point = $this->manager->getMountPointById($id);
+		
+		foreach ($dirList as $file) {
+			$update = false;
+			$exist  = false;
+			if($file->getType() == "dir")
+			{
+				continue;
+			}
+			foreach ($serverList->$mount_point as $data) {
+				if ($data->endpt == md5($file->getInternalPath())) {
+					$exist = true;
+					if ($file->getMTime() > intval($data->uptime))
+					{
+						$update = true;
+					}
+					break;
+				}
+			}
+			if($exist == false)
+			{
+				// Upload
+				$this->upload($file, $api_server, $mount_point);
+			}
+			else if ($exist == true && $update == true)
+			{
+				// Update
+				$this->update($file, $api_server, $mount_point);
+			}
+			else
+			{
+				"do nothing";
+			}
+		}
+
+
+		return new DataResponse(true);
+	}
+
+	private function upload($file, $api_server, $mount_point){
+		$filePath = $file->getInternalPath();
+		$fileType = $file->getMimetype();
+		$fileName = $file->getName();
+		$fileExt = $file->getExtension();
+		$file_content = $file->getStorage()->file_get_contents($filePath);
+		$path_hash  = md5($filePath);
+		$mtime  = $file->getMTime();
+		$baseName = str_replace(".".$fileExt,"",$fileName);
+
+		$url = $api_server . "/lool/templaterepo/upload";
+		$tmph = tmpfile();
+		fwrite($tmph, $file_content);
+		$tmpf = stream_get_meta_data($tmph)['uri'];
+		$fields = array(
+			'endpt' => $path_hash,
+			'filename' => curl_file_create($tmpf, $fileType, $fileName),
+			'extname' => $fileExt,
+			'cname' => $mount_point,
+			'docname' => $baseName,
+			'uptime' => strval($mtime)
+		);
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+		$response = curl_exec($curl);
+		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		if ($httpCode != 200) {
+			$this->notify("sync-fail", $fileName);
+		} else {
+			$this->notify("sync-success", $fileName);
+		}
+		curl_close($curl);
+	}
+
+	private function update($file, $api_server, $mount_point){
+		$filePath = $file->getInternalPath();
+		$fileType = $file->getMimetype();
+		$fileName = $file->getName();
+		$fileExt = $file->getExtension();
+		$file_content = $file->getStorage()->file_get_contents($filePath);
+		$path_hash  = md5($filePath);
+		$mtime  = $file->getMTime();
+		$baseName = str_replace(".".$fileExt,"",$fileName);
+
+		$url = $api_server . "/lool/templaterepo/update";
+		$tmph = tmpfile();
+		fwrite($tmph, $file_content);
+		$tmpf = stream_get_meta_data($tmph)['uri'];
+		$fields = array(
+			'endpt' => $path_hash,
+			'filename' => curl_file_create($tmpf, $fileType, $fileName),
+			'extname' => $fileExt,
+			'cname' => $mount_point,
+			'docname' => $baseName,
+			'uptime' => strval($mtime)
+		);
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_POST, true);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($curl, CURLOPT_URL, $url);
+		curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
+		curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
+		$response = curl_exec($curl);
+		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		if ($httpCode != 200) {
+			$this->notify("sync-fail", $fileName);
+		} else {
+			$this->notify("sync-success", $fileName);
+		}
+		curl_close($curl);
+	}
+
+	private function notify(string $type, string $filename)
+	{
+		$manager = \OC::$server->getNotificationManager();
+		$notification = $manager->createNotification();
+		$notification->setApp('templaterepo')
+			->setUser($user)
+			->setDateTime(new \DateTime())
+			->setObject('templaterepo', '1') // $type and $id
+			->setSubject($type, ['filename' => $filename, 'user' => $this->userId]);
+		$manager->notify($notification);
 	}
 
 }

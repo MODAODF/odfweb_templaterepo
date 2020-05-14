@@ -19,7 +19,7 @@ const defaultQuotaOptions = {
 	'無限制': -3
 };
 
-export type SortKey = 'mount_point' | 'quota' | 'groups';
+export type SortKey = 'mount_point' | 'quota' | 'groups' | 'acl' | 'users';
 
 export interface AppState {
 	folders: Folder[];
@@ -78,7 +78,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 			const folders = this.state.folders;
 			folders.push({
 				mount_point: mountPoint,
-				api_server: "127.0.0.1",
+				api_server: "https://127.0.0.1:9980",
 				groups: {},
 				users: {},
 				quota: -3,
@@ -104,6 +104,19 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 				if (confirmed) {
 					this.setState({folders: this.state.folders.filter(item => item.id !== folder.id)});
 					this.api.deleteFolder(folder.id);
+				}
+			},
+			true
+		);
+	};
+
+	syncFolder(folder: Folder) {
+		OC.dialogs.confirm(
+			t('templaterepo', 'Are you sure you want to sync "{folderName}" and all files inside?', { folderName: folder.mount_point }),
+			t('templaterepo', 'Sync "{folderName}"?', { folderName: folder.mount_point }),
+			confirmed => {
+				if (confirmed) {
+					this.api.syncFolder(folder.id);
 				}
 			},
 			true
@@ -166,7 +179,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 		this.api.renameFolder(folder.id, newName);
 	}
 
-    renameAPIServer(folder: Folder, newName: string) {
+	renameAPIServer(folder: Folder, newName: string) {
 		const folders = this.state.folders;
 		folder.api_server = newName;
 		this.setState({folders, editingAPIServer: 0});
@@ -210,6 +223,16 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 						return (a.quota - b.quota) * this.state.sortOrder;
 					case "groups":
 						return (Object.keys(a.groups).length - Object.keys(b.groups).length) * this.state.sortOrder;
+					case "users":
+						return (Object.keys(a.users).length - Object.keys(b.users).length) * this.state.sortOrder;
+					case "acl":
+						if (a.acl && !b.acl) {
+							return this.state.sortOrder;
+						}
+						if (!a.acl && b.acl) {
+							return -this.state.sortOrder;
+						}
+						return 0;
 				}
 			})
 			.map(folder => {
@@ -270,7 +293,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 									 size={folder.size}
 									 onChange={this.setQuota.bind(this, folder)}/>
 					</td>
-                    <td className="server">
+					<td className="server">
 						{this.state.editingAPIServer === id ?
 							<SubmitInput
 								autoFocus={true}
@@ -291,7 +314,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 							</a>
 						}
 					</td>
-                    {/*
+
                     <td className="acl">
                         <input id={`acl-${folder.id}`} type="checkbox" className="checkbox" checked={folder.acl} disabled={!App.supportACL()}
                             title={
@@ -300,6 +323,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
                                     t('templaterepo', 'Advanced permissions are only supported with Nextcloud 16 and up')}
                             onChange={(event) => this.setAcl(folder, event.target.checked)}
                         />
+                        <label htmlFor={`acl-${folder.id}`}></label>
                         {folder.acl &&
                             <ManageAclSelect
                                 folder={folder}
@@ -308,7 +332,11 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
                             />
                         }
                     </td>
-                    */}
+					<td className="sync">
+						<a className="icon icon-upload icon-visible"
+							onClick={this.syncFolder.bind(this, folder)}
+							title={t('templaterepo', 'SyncServer')}/>
+					</td>
 					<td className="remove">
 						<a className="icon icon-delete icon-visible"
 						   onClick={this.deleteFolder.bind(this, folder)}
@@ -334,7 +362,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 						<SortArrow name='groups' value={this.state.sort}
 								   direction={this.state.sortOrder}/>
 					</th>
-					<th onClick={() => this.onSortClick('groups')}>
+					<th onClick={() => this.onSortClick('users')}>
 						{t('templaterepo', 'Users')}
 						<SortArrow name='users' value={this.state.sort}
 							direction={this.state.sortOrder} />
@@ -347,13 +375,14 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 					<th>
 						{t('templaterepo', 'APIServer')}
 					</th>
-					{/*
+
 					<th onClick={() => this.onSortClick('acl')}>
 						{t('templaterepo', 'Advanced Permissions')}
 						<SortArrow name='acl' value={this.state.sort}
 							direction={this.state.sortOrder} />
 					</th>
-					*/}
+
+					<th/>
 					<th/>
 				</tr>
 				</thead>
