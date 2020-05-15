@@ -205,12 +205,48 @@ class Application extends App implements IBootstrap {
 			/** 註冊檔案 upload 同步 */
 			$rootfolder = $this->getContainer()->getServer()->getRootFolder();
 
-			/** 禁止創造子資料夾 */
+			/** 禁止透過創造產生子資料夾 */
 			$rootfolder->listen('\OC\Files', 'preCreate', function ($k) {
 				$method = \OC::$server->getRequest()->getMethod();
 				$mount_type = $k->getParent()->getFileInfo()->getMountPoint()->getMountType();
 				if ($method == "MKCOL" && $mount_type == "templaterepo") {
 					throw new \OC\ServerNotAvailableException;
+				}
+			});
+
+			/** 禁止透過複製產生子資料夾 */
+			$rootfolder->listen('\OC\Files', 'preCopy', function ($k) {
+				$method = \OC::$server->getRequest()->getMethod();
+				$mount_type = $k->getParent()->getFileInfo()->getMountPoint()->getMountType();
+				if ($method == "COPY" && $mount_type == "templaterepo") {
+					// Create a sabre server instance to get the information for the request
+					$tmpuri = "/remote.php/dav";
+					$request = \OC::$server->getRequest();
+					$tmps = new \OCA\DAV\Server($request, $tmpuri);
+					$path = $tmps->server->httpRequest->getPath();
+					$path = str_replace("remote.php/dav", "", $path);
+					$node = $tmps->server->tree->getNodeForPath($path);
+					if ($node->getFileInfo()->getType() == "dir") {
+						throw new \OC\ServerNotAvailableException;
+					}
+				}
+			});
+
+			/** 禁止透過移動產生子資料夾 */
+			$rootfolder->listen('\OC\Files', 'preRename', function ($k) {
+				$method = \OC::$server->getRequest()->getMethod();
+				$tmpuri = "/remote.php/dav";
+				$request = \OC::$server->getRequest();
+				$tmps = new \OCA\DAV\Server($request, $tmpuri);
+				$dest = $tmps->server->getCopyAndMoveInfo($tmps->server->httpRequest);
+				$destPath = $dest['destination'];
+				$destDir = dirname($destPath);
+				$mount_type = $tmps->server->tree->getNodeForPath($destDir)->getFileInfo()->getMountPoint()->getMountType();
+				if ($method == "MOVE" && $mount_type == "templaterepo") {
+					// Create a sabre server instance to get the information for the request
+					if ($k->getFileInfo()->getType() == "dir") {
+						throw new \OC\ServerNotAvailableException;
+					}
 				}
 			});
 
