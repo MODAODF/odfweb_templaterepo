@@ -212,6 +212,11 @@ class Application extends App implements IBootstrap {
 				if ($method == "MKCOL" && $mount_type == "templaterepo") {
 					throw new \OC\ServerNotAvailableException;
 				}
+
+				$ext = strtolower(pathinfo($k->getPath(), PATHINFO_EXTENSION));
+				if ($mount_type == "templaterepo" && ($ext != "odt" && $ext != "ods" && $ext != "odp")) {
+					throw new \OC\ServerNotAvailableException;
+				}
 			});
 
 			/** 禁止透過複製產生子資料夾 */
