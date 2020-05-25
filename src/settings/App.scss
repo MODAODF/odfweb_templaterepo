@@ -68,16 +68,6 @@
 		&.quota {
 			width: 180px;
 		}
-		&.acl {
-			display: flex;
-			& > div {
-				min-width: 150px;
-				flex-grow: 1;
-			}
-			& > label {
-				padding-top: 10px;
-			}
-		}
 
 		&.remove {
 			width: 32px;
