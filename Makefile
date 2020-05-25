@@ -33,7 +33,7 @@ watch: node_modules
 release: appstore create-tag
 
 create-tag:
-	git tag -s -a v$(version) -m "Tagging the $(version) release."
+	git tag -a v$(version) -m "Tagging the $(version) release."
 	git push origin v$(version)
 
 appstore: clean build/main.js
