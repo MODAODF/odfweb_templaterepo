@@ -12,7 +12,7 @@ After a folder is created, the admin can give access to the folder to one or mor
 Note: Encrypting the contents of group folders is currently not supported.]]></description>
 	<version>12.0.1</version>
 	<licence>agpl</licence>
-	<author>Robin Appelman</author>
+	<author>Robin Appelman,Tommy Wu</author>
 	<namespace>GroupFolders</namespace>
 	<types>
 		<filesystem/>
@@ -20,14 +20,6 @@ Note: Encrypting the contents of group folders is currently not supported.]]></d
 	</types>
 
 	<category>files</category>
-
-	<website>https://github.com/nextcloud/groupfolders</website>
-	<bugs>https://github.com/nextcloud/groupfolders/issues</bugs>
-	<repository type="git">https://github.com/nextcloud/groupfolders.git</repository>
-
-	<screenshot>https://raw.githubusercontent.com/nextcloud/groupfolders/master/screenshots/folders.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/groupfolders/master/screenshots/edit.png</screenshot>
-	<screenshot>https://raw.githubusercontent.com/nextcloud/groupfolders/master/screenshots/permissions.png</screenshot>
 
 	<dependencies>
 		<nextcloud min-version="24" max-version="24" />
