@@ -214,7 +214,7 @@ class Application extends App implements IBootstrap {
 				}
 
 				$ext = strtolower(pathinfo($k->getPath(), PATHINFO_EXTENSION));
-				if ($mount_type == "templaterepo" && ($ext != "odt" && $ext != "ods" && $ext != "odp")) {
+				if ($mount_type == "templaterepo" && ($ext != "ott" && $ext != "ots" && $ext != "otp")) {
 					throw new \OC\ServerNotAvailableException;
 				}
 			});
