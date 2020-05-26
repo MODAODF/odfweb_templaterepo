@@ -506,7 +506,7 @@ class FolderController extends OCSController {
 		$manager = \OC::$server->getNotificationManager();
 		$notification = $manager->createNotification();
 		$notification->setApp('templaterepo')
-			->setUser($user)
+			->setUser($this->userId)
 			->setDateTime(new \DateTime())
 			->setObject('templaterepo', '1') // $type and $id
 			->setSubject($type, ['filename' => $filename, 'user' => $this->userId]);
