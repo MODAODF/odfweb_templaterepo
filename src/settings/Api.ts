@@ -36,7 +36,6 @@ export interface Folder {
 	size: number;
 	groups: { [group: string]: number };
 	users: { [user: string]: number };
-	acl: boolean;
 	manage: ManageRuleProps[];
 }
 
@@ -129,23 +128,9 @@ export class Api {
 		});
 	}
 
-	setManageACL(folderId: number, type: string, id: string, manageACL: boolean): Thenable<void> {
-		return $.post(this.getUrl(`folders/${folderId}/manageACL`), {
-			mappingType: type,
-			mappingId: id,
-			manageAcl: manageACL ? 1 : 0
-		});
-	}
-
 	setQuota(folderId: number, quota: number): Thenable<void> {
 		return $.post(this.getUrl(`folders/${folderId}/quota`), {
 			quota
-		});
-	}
-
-	setACL(folderId: number, acl: boolean): Thenable<void> {
-		return $.post(this.getUrl(`folders/${folderId}/acl`), {
-			acl: acl ? 1 : 0
 		});
 	}
 
@@ -153,27 +138,5 @@ export class Api {
 		return $.post(this.getUrl(`folders/${folderId}/mountpoint`), {
 			mountpoint
 		});
-	}
-
-	aclMappingSearch(folderId: number, search: string): Thenable<{groups: OCSGroup[], users: OCSUser[]}> {
-		return $.getJSON(this.getUrl(`folders/${folderId}/search?format=json&search=${search}`))
-			.then((data: OCSResult<{ groups: OCSGroup[]; users: OCSUser[]; }>) => {
-				return {
-					groups: Object.values(data.ocs.data.groups).map((item) => {
-						return {
-							type: 'group',
-							id: item.gid,
-							displayname: item.displayname
-						}
-					}),
-					users: Object.values(data.ocs.data.users).map((item) => {
-						return {
-							type: 'user',
-							id: item.uid,
-							displayname: item.displayname
-						}
-					})
-				}
-			});
 	}
 }

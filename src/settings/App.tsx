@@ -19,7 +19,7 @@ const defaultQuotaOptions = {
 	'無限制': -3
 };
 
-export type SortKey = 'mount_point' | 'quota' | 'groups' | 'acl';
+export type SortKey = 'mount_point' | 'quota' | 'groups';
 
 export interface AppState {
 	folders: Folder[];
@@ -81,7 +81,6 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 				quota: -3,
 				size: 0,
 				id,
-				acl: false,
 				manage: []
 			});
 			this.setState({folders});
@@ -150,14 +149,6 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 		this.api.setPermissions(folder.id, user, newPermissions);
 	}
 
-	setManageACL(folder: Folder, type: string, id: string, manageACL: boolean) {
-		this.api.setManageACL(folder.id, type, id, manageACL);
-	}
-
-	searchMappings(folder: Folder, search: string) {
-		return this.api.aclMappingSearch(folder.id, search)
-	}
-
 	setQuota(folder: Folder, quota: number) {
 		const folders = this.state.folders;
 		folder.quota = quota;
@@ -172,13 +163,6 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 		this.api.renameFolder(folder.id, newName);
 	}
 
-	setAcl(folder: Folder, acl: boolean) {
-		const folders = this.state.folders;
-		folder.acl = acl;
-		this.setState({folders});
-		this.api.setACL(folder.id, acl);
-	}
-
 	onSortClick = (sort: SortKey) => {
 		if (this.state.sort === sort) {
 			this.setState({sortOrder: -this.state.sortOrder});
@@ -186,10 +170,6 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 			this.setState({sortOrder: 1, sort});
 		}
 	};
-
-	static supportACL(): boolean {
-		return parseInt(OC.config.version,10) >= 16;
-	}
 
 	render() {
 		const rows = this.state.folders
@@ -213,14 +193,6 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 						return (a.quota - b.quota) * this.state.sortOrder;
 					case "groups":
 						return (Object.keys(a.groups).length - Object.keys(b.groups).length) * this.state.sortOrder;
-					case "acl":
-						if (a.acl && !b.acl) {
-							return this.state.sortOrder;
-						}
-						if (!a.acl && b.acl) {
-							return -this.state.sortOrder;
-						}
-						return 0;
 				}
 			})
 			.map(folder => {
@@ -281,23 +253,6 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 									 size={folder.size}
 									 onChange={this.setQuota.bind(this, folder)}/>
 					</td>
-					<td className="acl">
-						<input id={`acl-${folder.id}`} type="checkbox" className="checkbox" checked={folder.acl} disabled={!App.supportACL()}
-							   title={
-							   	App.supportACL()?
-									t('groupfolders', 'Advanced permissions allows setting permissions on a per-file basis but comes with a performance overhead'):
-									t('groupfolders', 'Advanced permissions are only supported with Nextcloud 16 and up')}
-							   onChange={(event) => this.setAcl(folder, event.target.checked)}
-						/>
-						<label htmlFor={`acl-${folder.id}`}></label>
-						{folder.acl &&
-							<ManageAclSelect
-								folder={folder}
-								onChange={this.setManageACL.bind(this, folder)}
-								onSearch={this.searchMappings.bind(this, folder)}
-							/>
-						}
-					</td>
 					<td className="remove">
 						<a className="icon icon-delete icon-visible"
 						   onClick={this.deleteFolder.bind(this, folder)}
@@ -333,11 +288,6 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 						<SortArrow name='quota' value={this.state.sort}
 								   direction={this.state.sortOrder}/>
 					</th>
-					<th onClick={() => this.onSortClick('acl')}>
-						{t('groupfolders', 'Advanced Permissions')}
-						<SortArrow name='acl' value={this.state.sort}
-								   direction={this.state.sortOrder}/>
-					</th>
 					<th/>
 				</tr>
 				</thead>
@@ -363,82 +313,4 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 			</table>
 		</div>;
 	}
-}
-
-
-interface ManageAclSelectProps {
-	folder: Folder;
-	onChange: (type: string, id: string, manageAcl: boolean) => void;
-	onSearch:  (name: string) => Thenable<{ groups: OCSGroup[]; users: OCSUser[]; }>;
-};
-
-
-
-function ManageAclSelect({onChange, onSearch, folder}: ManageAclSelectProps) {
-	const handleSearch = (inputValue: string) => {
-		return new Promise(resolve => {
-			onSearch(inputValue).then((result) => {
-				resolve([...result.groups, ...result.users])
-			})
-		})
-	}
-
-	const typeLabel = (item) => {
-		return item.type === 'user' ? t('groupfolders', 'User') : t('groupfolders', 'Group')
-	}
-	return <AsyncSelect
-		loadOptions={handleSearch}
-		isMulti
-		cacheOptions
-		defaultOptions
-		defaultValue={folder.manage}
-		isClearable={false}
-		onChange={(option, details) => {
-			if (details.action === 'select-option') {
-				const addedOption = details.option
-				onChange && addedOption && onChange(addedOption.type, addedOption.id, true)
-			}
-			if (details.action === 'remove-value') {
-				const removedValue = details.removedValue
-				onChange && onChange(removedValue.type, removedValue.id, false)
-			}
-		}}
-		placeholder={t('groupfolders', 'Users/groups that can manage')}
-		getOptionLabel={(option) => `${option.displayname} (${typeLabel(option)})`}
-		getOptionValue={(option) => option.type + '/' + option.id }
-		styles={{
-			control: base => ({
-				...base,
-				minHeight: 25,
-				borderWidth: 1
-			}),
-			dropdownIndicator: base => ({
-				...base,
-				padding: 4
-			}),
-			clearIndicator: base => ({
-				...base,
-				padding: 4
-			}),
-			multiValue: base => ({
-				...base,
-				backgroundColor: 'var(--color-background-dark)',
-				color: 'var(--color-text)'
-			}),
-			valueContainer: base => ({
-				...base,
-				padding: '0px 6px'
-			}),
-			input: base => ({
-				...base,
-				margin: 0,
-				padding: 0
-			}),
-			menu: (provided) => ({
-				...provided,
-				backgroundColor: 'var(--color-main-background)',
-				borderColor: 'var(--color-border)',
-			})
-		}}
-	/>
 }
