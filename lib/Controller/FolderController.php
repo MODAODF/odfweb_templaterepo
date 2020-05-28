@@ -425,7 +425,7 @@ class FolderController extends OCSController {
 			foreach ($serverList->$mount_point as $data) {
 				if ($data->endpt == md5($file->getInternalPath())) {
 					$exist = true;
-					if ($file->getMTime() > intval($data->uptime)) {
+					if ($file->getMTime() > intval(strtotime($data->uptime))) {
 						$update = true;
 					}
 					break;
@@ -434,11 +434,11 @@ class FolderController extends OCSController {
 			if ($exist == false) {
 				// Upload
 				$result = $this->upload($file, $api_server, $mount_point);
-				$sync_result[$file->getName()] = $result ? " 成功\n" : " 失敗\n";
+				$sync_result[$file->getName()] = $result ? "成功" : "失敗";
 			} else if ($exist == true && $update == true) {
 				// Update
 				$result = $this->update($file, $api_server, $mount_point);
-				$sync_result[$file->getName()] = $result ? " 成功\n" : " 失敗\n";
+				$sync_result[$file->getName()] = $result ? "成功" : "失敗";
 			} else {
 				$sync_result[$file->getName()] = '略過';
 			}
@@ -473,7 +473,7 @@ class FolderController extends OCSController {
 			'extname' => $fileExt,
 			'cname' => $mount_point,
 			'docname' => $baseName,
-			'uptime' => strval($mtime)
+			'uptime' => date("Y-m-d H:i:s", $mtime)
 		);
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_POST, true);
@@ -514,7 +514,7 @@ class FolderController extends OCSController {
 			'extname' => $fileExt,
 			'cname' => $mount_point,
 			'docname' => $baseName,
-			'uptime' => strval($mtime)
+			'uptime' => date("Y-m-d H:i:s", $mtime)
 		);
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_POST, true);
