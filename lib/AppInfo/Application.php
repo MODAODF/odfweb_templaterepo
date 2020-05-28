@@ -374,10 +374,11 @@ class Application extends App implements IBootstrap {
 		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		$mount_point = $this->getFolderManager()->getMountPointById($folderId);
 		if ($httpCode != 200) {
-			$this->notify("upload-fail", $fileName);
+			$this->notify("upload-fail", $mount_point, $api_server, $fileName);
 		} else {
-			$this->notify("upload-success", $fileName);
+			$this->notify("upload-success", $mount_point, $api_server, $fileName);
 		}
 		curl_close($curl);
 	}
@@ -404,10 +405,11 @@ class Application extends App implements IBootstrap {
 		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		$mount_point = $this->getFolderManager()->getMountPointById($folderId);
 		if ($httpCode != 200) {
-			$this->notify("delete-fail", $fileName);
+			$this->notify("upload-fail", $mount_point, $api_server, $fileName);
 		} else {
-			$this->notify("delete-success", $fileName);
+			$this->notify("upload-success", $mount_point, $api_server, $fileName);
 		}
 		curl_close($curl);
 	}
@@ -446,15 +448,16 @@ class Application extends App implements IBootstrap {
 		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		$mount_point = $this->getFolderManager()->getMountPointById($folderId);
 		if ($httpCode != 200) {
-			$this->notify("update-fail", $fileName);
+			$this->notify("upload-fail", $mount_point, $api_server, $fileName);
 		} else {
-			$this->notify("update-success", $fileName);
+			$this->notify("upload-success", $mount_point, $api_server, $fileName);
 		}
 		curl_close($curl);
 	}
 
-	private function notify(string $type, string $filename) {
+	private function notify(string $type, string $mount_point, string $api_server, string $filename) {
 		$user = $this->getContainer()->getServer()->getSession()->get('user_id');
 		$manager = $this->getContainer()->getServer()->getNotificationManager();
 		$notification = $manager->createNotification();
@@ -462,7 +465,12 @@ class Application extends App implements IBootstrap {
 			->setUser($user)
 			->setDateTime(new \DateTime())
 			->setObject('templaterepo', '1') // $type and $id
-			->setSubject($type, ['filename' => $filename, 'user' => $user]);
+			->setSubject($type, [
+				'filename' => $filename,
+				'user' => $user,
+				'api_server' => $api_server,
+				'mount_point' => $mount_point
+			]);
 		$manager->notify($notification);
 	}
 }

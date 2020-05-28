@@ -22,9 +22,10 @@ class Notifier implements INotifier {
         $parameters = $notification->getSubjectParameters();
         switch ($notification->getSubject()) {
             case 'upload-success':
-                $subject = "TemplateRepo";
+                $subject = "範本中心通知( ".$parameters['api_server']." )";
                 $subjectParameters = [];
-                $message = $parameters['filename'] . " 遠端同步成功";
+                $message = "[".$parameters['mount_point']."] 範本同步結果\n";
+                $message = $message . $parameters['filename'] . " 遠端同步成功";
                 $messageParameters = [];
                 $notification->setRichSubject($subject, $subjectParameters)
                     ->setParsedSubject($subject)
@@ -32,9 +33,10 @@ class Notifier implements INotifier {
                     ->setParsedMessage($message);
                 return $notification;
             case 'upload-fail':
-                $subject = "TemplateRepo";
+                $subject = "範本中心通知( ".$parameters['api_server']." )";
                 $subjectParameters = [];
-                $message = $parameters['filename'] . " 遠端同步失敗";
+                $message = "[".$parameters['mount_point']."] 範本同步結果\n";
+                $message = $message . $parameters['filename'] . " 遠端同步失敗";
                 $messageParameters = [];
                 $notification->setRichSubject($subject, $subjectParameters)
                     ->setParsedSubject($subject)
@@ -42,9 +44,10 @@ class Notifier implements INotifier {
                     ->setParsedMessage($message);
                 return $notification;
             case 'delete-success':
-                $subject = "TemplateRepo";
+                $subject = "範本中心通知( ".$parameters['api_server']." )";
                 $subjectParameters = [];
-                $message = $parameters['filename'] . " 遠端刪除成功";
+                $message = "[".$parameters['mount_point']."] 範本同步結果\n";
+                $message = $message . $parameters['filename'] . " 遠端刪除成功";
                 $messageParameters = [];
                 $notification->setRichSubject($subject, $subjectParameters)
                     ->setParsedSubject($subject)
@@ -52,9 +55,10 @@ class Notifier implements INotifier {
                     ->setParsedMessage($message);
                 return $notification;
             case 'delete-fail':
-                $subject = "TemplateRepo";
+                $subject = "範本中心通知( ".$parameters['api_server']." )";
                 $subjectParameters = [];
-                $message = $parameters['filename'] . " 遠端刪除失敗";
+                $message = "[".$parameters['mount_point']."] 範本同步結果\n";
+                $message = $message . $parameters['filename'] . " 遠端刪除失敗";
                 $messageParameters = [];
                 $notification->setRichSubject($subject, $subjectParameters)
                     ->setParsedSubject($subject)
@@ -62,9 +66,10 @@ class Notifier implements INotifier {
                     ->setParsedMessage($message);
                 return $notification;
             case 'update-success':
-                $subject = "TemplateRepo";
+                $subject = "範本中心通知( ".$parameters['api_server']." )";
                 $subjectParameters = [];
-                $message = $parameters['filename'] . " 遠端更新成功";
+                $message = "[".$parameters['mount_point']."] 範本同步結果\n";
+                $message = $message . $parameters['filename'] . " 遠端更新成功";
                 $messageParameters = [];
                 $notification->setRichSubject($subject, $subjectParameters)
                     ->setParsedSubject($subject)
@@ -72,29 +77,34 @@ class Notifier implements INotifier {
                     ->setParsedMessage($message);
                 return $notification;
             case 'update-fail':
-                $subject = "TemplateRepo";
+                $subject = "範本中心通知( ".$parameters['api_server']." )";
                 $subjectParameters = [];
-                $message = $parameters['filename'] . " 遠端更新失敗";
+                $message = "[".$parameters['mount_point']."] 範本同步結果\n";
+                $message = $message . $parameters['filename'] . " 遠端更新失敗";
                 $messageParameters = [];
                 $notification->setRichSubject($subject, $subjectParameters)
                     ->setParsedSubject($subject)
                     ->setRichMessage($message, $messageParameters)
                     ->setParsedMessage($message);
                 return $notification;
-            case 'sync-success':
-                $subject = "TemplateRepo";
+            case 'sync-result':
+                $subject = "範本中心通知( ".$parameters['api_server']." )";
                 $subjectParameters = [];
-                $message = "[SYSTEM] ".$parameters['filename'] . " 同步成功";
+                $sync_result = $parameters['sync_result'];
+                $message = "[".$parameters['mount_point']."] 範本同步結果彙整\n";
+                foreach ($sync_result as $filename => $result) {
+                    $message = $message . "<" .$result . "> " . $filename . "\n";
+                }
                 $messageParameters = [];
                 $notification->setRichSubject($subject, $subjectParameters)
                     ->setParsedSubject($subject)
                     ->setRichMessage($message, $messageParameters)
                     ->setParsedMessage($message);
                 return $notification;
-            case 'sync-fail':
-                $subject = "TemplateRepo";
+            case 'sync-empty':
+                $subject = "範本中心通知( ".$parameters['api_server']." )";
                 $subjectParameters = [];
-                $message = "[SYSTEM] ".$parameters['filename'] . " 同步失敗";
+                $message = "[".$parameters['mount_point']."] 範本無同步需求\n";
                 $messageParameters = [];
                 $notification->setRichSubject($subject, $subjectParameters)
                     ->setParsedSubject($subject)

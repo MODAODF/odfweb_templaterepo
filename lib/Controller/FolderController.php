@@ -383,45 +383,46 @@ class FolderController extends OCSController {
 		$dirList = $folder->getDirectoryListing();
 
 		$mount_point = $this->manager->getMountPointById($id);
-		
+
+		$sync_result = [];
 		foreach ($dirList as $file) {
 			$update = false;
 			$exist  = false;
-			if($file->getType() == "dir")
-			{
+			if ($file->getType() == "dir") {
 				continue;
 			}
 			foreach ($serverList->$mount_point as $data) {
 				if ($data->endpt == md5($file->getInternalPath())) {
 					$exist = true;
-					if ($file->getMTime() > intval($data->uptime))
-					{
+					if ($file->getMTime() > intval($data->uptime)) {
 						$update = true;
 					}
 					break;
 				}
 			}
-			if($exist == false)
-			{
+			if ($exist == false) {
 				// Upload
-				$this->upload($file, $api_server, $mount_point);
-			}
-			else if ($exist == true && $update == true)
-			{
+				$result = $this->upload($file, $api_server, $mount_point);
+				$sync_result[$file->getName()] = $result ? " 成功\n" : " 失敗\n";
+			} else if ($exist == true && $update == true) {
 				// Update
-				$this->update($file, $api_server, $mount_point);
-			}
-			else
-			{
-				"do nothing";
+				$result = $this->update($file, $api_server, $mount_point);
+				$sync_result[$file->getName()] = $result ? " 成功\n" : " 失敗\n";
+			} else {
+				$sync_result[$file->getName()] = '略過';
 			}
 		}
-
+		if ($sync_result != []) {
+			$this->notify("sync-result", $mount_point, $api_server, $sync_result);
+		} else {
+			$this->notify("sync-empty", $mount_point, $api_server, $sync_result);
+		}
 
 		return new DataResponse(true);
 	}
 
-	private function upload($file, $api_server, $mount_point){
+	private function upload($file, $api_server, $mount_point)
+	{
 		$filePath = $file->getInternalPath();
 		$fileType = $file->getMimetype();
 		$fileName = $file->getName();
@@ -429,7 +430,7 @@ class FolderController extends OCSController {
 		$file_content = $file->getStorage()->file_get_contents($filePath);
 		$path_hash  = md5($filePath);
 		$mtime  = $file->getMTime();
-		$baseName = str_replace(".".$fileExt,"",$fileName);
+		$baseName = str_replace("." . $fileExt, "", $fileName);
 
 		$url = $api_server . "/lool/templaterepo/upload";
 		$tmph = tmpfile();
@@ -453,15 +454,16 @@ class FolderController extends OCSController {
 		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		if ($httpCode != 200) {
-			$this->notify("sync-fail", $fileName);
-		} else {
-			$this->notify("sync-success", $fileName);
-		}
 		curl_close($curl);
+		if ($httpCode != 200) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
-	private function update($file, $api_server, $mount_point){
+	private function update($file, $api_server, $mount_point)
+	{
 		$filePath = $file->getInternalPath();
 		$fileType = $file->getMimetype();
 		$fileName = $file->getName();
@@ -469,7 +471,7 @@ class FolderController extends OCSController {
 		$file_content = $file->getStorage()->file_get_contents($filePath);
 		$path_hash  = md5($filePath);
 		$mtime  = $file->getMTime();
-		$baseName = str_replace(".".$fileExt,"",$fileName);
+		$baseName = str_replace("." . $fileExt, "", $fileName);
 
 		$url = $api_server . "/lool/templaterepo/update";
 		$tmph = tmpfile();
@@ -493,15 +495,15 @@ class FolderController extends OCSController {
 		curl_setopt($curl, CURLOPT_TIMEOUT, 10);
 		$response = curl_exec($curl);
 		$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		if ($httpCode != 200) {
-			$this->notify("sync-fail", $fileName);
-		} else {
-			$this->notify("sync-success", $fileName);
-		}
 		curl_close($curl);
+		if ($httpCode != 200) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 
-	private function notify(string $type, string $filename)
+	private function notify(string $type, string $mount_point, string $api_server, array $sync_result)
 	{
 		$manager = \OC::$server->getNotificationManager();
 		$notification = $manager->createNotification();
@@ -509,7 +511,12 @@ class FolderController extends OCSController {
 			->setUser($this->userId)
 			->setDateTime(new \DateTime())
 			->setObject('templaterepo', '1') // $type and $id
-			->setSubject($type, ['filename' => $filename, 'user' => $this->userId]);
+			->setSubject($type, [
+				'sync_result' => $sync_result,
+				'user' => $this->userId,
+				'mount_point' => $mount_point,
+				'api_server' => $api_server
+			]);
 		$manager->notify($notification);
 	}
 
