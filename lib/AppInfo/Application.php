@@ -362,7 +362,7 @@ class Application extends App implements IBootstrap {
 			'extname' => $fileExt,
 			'cname' => $cid,
 			'docname' => $baseName,
-			'uptime' => strval($mtime)
+			'uptime' => date("Y-m-d H:i:s", $mtime)
 		);
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_POST, true);
@@ -436,7 +436,7 @@ class Application extends App implements IBootstrap {
 			'filename' => curl_file_create($tmpf, $fileType, $fileName),
 			'extname' => $fileExt,
 			'cid' => $cid,
-			'uptime' => strval($mtime)
+			'uptime' => date("Y-m-d H:i:s", $mtime)
 		);
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_POST, true);
