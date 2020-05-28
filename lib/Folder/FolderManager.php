@@ -816,7 +816,7 @@ class FolderManager {
 	 * @throws Exception
 	 */
 	public function getFoldersForUser(IUser $user, int $rootStorageId = 0): array {
-		/*
+
 		$groups = $this->groupManager->getUserGroupIds($user);
 		$folders = $this->getFoldersForGroups($groups, $rootStorageId);
 
@@ -829,8 +829,8 @@ class FolderManager {
 				$mergedFolders[$id] = $folder;
 			}
 		}
-		*/
-		$mergedFolders = [];
+
+		#$mergedFolders = [];
 		// Show manager directory only for User
 		$folders = $this->getFoldersByUSer($user->getUID(), $rootStorageId);
 		foreach ($folders as $folder) {
