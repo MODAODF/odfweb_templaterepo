@@ -125,7 +125,7 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 
 	addGroup(folder: Folder, group: string) {
 		const folders = this.state.folders;
-		folder.groups[group] = OC.PERMISSION_READ;
+		folder.groups[group] = OC.PERMISSION_ALL ^ OC.PERMISSION_SHARE;
 		this.setState({folders});
 		this.api.addGroup(folder.id, group);
 	}
@@ -139,8 +139,8 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 
 	addUser(folder: Folder, user: string) {
 		const folders = this.state.folders;
-		folder.users[user] = OC.PERMISSION_ALL;
-		this.setState({folders });
+		folder.users[user] = OC.PERMISSION_ALL ^ OC.PERMISSION_SHARE;
+		this.setState({folders});
 		this.api.addUser(folder.id, user);
 	}
 
