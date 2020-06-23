@@ -648,7 +648,7 @@ class FolderManager {
 			->values([
 				'folder_id' => $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT),
 				'group_id' => $query->createNamedParameter($groupId),
-				'permissions' => $query->createNamedParameter(Constants::PERMISSION_ALL)
+				'permissions' => $query->createNamedParameter(Constants::PERMISSION_ALL ^ Constants::PERMISSION_SHARE)
 			]);
 		$query->executeStatement();
 	}
@@ -672,7 +672,7 @@ class FolderManager {
 			->values([
 				'folder_id' => $query->createNamedParameter($folderId, IQueryBuilder::PARAM_INT),
 				'user_id' => $query->createNamedParameter($userId),
-				'permissions' => $query->createNamedParameter(Constants::PERMISSION_ALL)
+				'permissions' => $query->createNamedParameter(Constants::PERMISSION_ALL ^ Constants::PERMISSION_SHARE)
 			]);
 		$query->execute();
 	}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import './FolderGroups.scss';
-import {SyntheticEvent} from "react";
-import {Group} from "./Api";
+import { SyntheticEvent } from "react";
+import { Group } from "./Api";
 import Select from 'react-select'
 
 function hasPermissions(value: number, check: number): boolean {
@@ -40,18 +40,13 @@ export function FolderGroups({groups, allGroups = [], onAddGroup, removeGroup, e
 				</td>
 				<td className="permissions">
 					<input type="checkbox"
-						   onChange={setPermissions.bind(null, OC.PERMISSION_UPDATE | OC.PERMISSION_CREATE, groupId)}
-						   checked={hasPermissions(permissions, (OC.PERMISSION_UPDATE | OC.PERMISSION_CREATE))}/>
+						onChange={setPermissions.bind(null, OC.PERMISSION_UPDATE | OC.PERMISSION_CREATE, groupId)}
+						checked={hasPermissions(permissions, (OC.PERMISSION_UPDATE | OC.PERMISSION_CREATE))} />
 				</td>
 				<td className="permissions">
 					<input type="checkbox"
-						   onChange={setPermissions.bind(null, OC.PERMISSION_SHARE, groupId)}
-						   checked={hasPermissions(permissions, OC.PERMISSION_SHARE)}/>
-				</td>
-				<td className="permissions">
-					<input type="checkbox"
-						   onChange={setPermissions.bind(null, OC.PERMISSION_DELETE, groupId)}
-						   checked={hasPermissions(permissions, (OC.PERMISSION_DELETE))}/>
+						onChange={setPermissions.bind(null, OC.PERMISSION_DELETE, groupId)}
+						checked={hasPermissions(permissions, (OC.PERMISSION_DELETE))} />
 				</td>
 				<td>
 					<a onClick={removeGroup.bind(this, groupId)} className="close-btn"></a>
@@ -60,15 +55,14 @@ export function FolderGroups({groups, allGroups = [], onAddGroup, removeGroup, e
 		});
 
 		return <table className="group-edit"
-					  onClick={event => event.stopPropagation()}>
+			onClick={event => event.stopPropagation()}>
 			<thead>
-			<tr>
-				<th>{t('templaterepo', 'Group')}</th>
-				<th>{t('templaterepo', 'Write')}</th>
-				<th>{t('templaterepo', 'Share')}</th>
-				<th>{t('templaterepo', 'Delete')}</th>
-				<th/>
-			</tr>
+				<tr>
+					<th>{t('templaterepo', 'Group')}</th>
+					<th>{t('templaterepo', 'Write')}</th>
+					<th>{t('templaterepo', 'Delete')}</th>
+					<th />
+				</tr>
 			</thead>
 			<tbody>
 			{rows}
@@ -85,7 +79,7 @@ export function FolderGroups({groups, allGroups = [], onAddGroup, removeGroup, e
 		if (Object.keys(groups).length === 0) {
 			return <span>
 				<em>無</em>
-				<a className="icon icon-rename" onClick={showEdit}/>
+				<a className="icon icon-rename" onClick={showEdit} />
 			</span>
 		}
 		return <a className="action-rename" onClick={showEdit}>
