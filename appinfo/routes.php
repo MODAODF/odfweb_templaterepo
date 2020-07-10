@@ -113,4 +113,9 @@ return ['routes' => [
 		'url' => '/syncfolder/{id}',
 		'verb' => 'GET'
 	],
+	[
+		'name' => 'Folder#renameFolder',
+		'url' => '/folders/{id}/mountpoint',
+		'verb' => 'POST'
+	],
 ]];
