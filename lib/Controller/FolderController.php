@@ -345,6 +345,9 @@ class FolderController extends OCSController {
 		}, $nodes));
 	}
 
+	/**
+	 * @NoAdminRequired
+	*/
 	public function getFolderList()	{
 		$x = 1;
 		$mounts  = $this->rootFolder->getMountsIn("");

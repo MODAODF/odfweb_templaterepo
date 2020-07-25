@@ -8,7 +8,7 @@ sign_dir=$(build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
 webpack=node_modules/.bin/webpack
-version+=1.0.4
+version+=1.0.5
 BRANCH:=$(shell cat dist_git_branch 2> /dev/null || git rev-parse --abbrev-ref HEAD 2> /dev/null)
 
 jssources=$(wildcard js/*) $(wildcard js/*/*) $(wildcard css/*/*)  $(wildcard css/*)
