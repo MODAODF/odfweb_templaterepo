@@ -49,7 +49,9 @@ class Version104000Date20180918132853 extends SimpleMigrationStep {
 				'length' => 6,
 			]);
 			$table->setPrimaryKey(['trash_id']);
-			$table->addUniqueIndex(['folder_id', 'name', 'deleted_time'], 'templates_repo_trash_unique');
+			if (!$table->hasIndex('templates_repo_trash_unique')) {
+				$table->addUniqueIndex(['folder_id', 'name', 'deleted_time'], 'templates_repo_trash_unique');
+			}
 		}
 
 		return $schema;

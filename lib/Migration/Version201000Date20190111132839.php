@@ -50,8 +50,12 @@ class Version201000Date20190111132839 extends SimpleMigrationStep {
 				'notnull' => true,
 			]);
 			$table->setPrimaryKey(['acl_id']);
-			$table->addIndex(['mapping_type', 'mapping_id'], 'templates_repo_acl_mapping');
-			$table->addUniqueIndex(['fileid', 'mapping_type', 'mapping_id'], 'templates_repo_acl_unique');
+			if (!$table->hasIndex('templates_repo_acl_mapping')) {
+				$table->addIndex(['mapping_type', 'mapping_id'], 'templates_repo_acl_mapping');
+			}
+			if (!$table->hasIndex('templates_repo_acl_unique')) {
+				$table->addUniqueIndex(['fileid', 'mapping_type', 'mapping_id'], 'templates_repo_acl_unique');
+			}
 		}
 
 		return $schema;
