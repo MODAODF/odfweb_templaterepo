@@ -58,6 +58,8 @@ $(document).ready(function () {
 							// root has special permissions
 							this.$el.find('#emptycontent').toggleClass('hidden', !this.isEmpty);
 							this.$el.find('#filestable thead th').toggleClass('hidden', this.isEmpty);
+							this.$el.find('#emptycontent').html('<div class="nav-icon-templaterepo"></div>' +
+								'<h2>' + t('templaterepo', 'No Template Repo') + '</h2>');
 						}
 						else {
 							OCA.Files.FileList.prototype.updateEmptyContent.apply(this, arguments);
