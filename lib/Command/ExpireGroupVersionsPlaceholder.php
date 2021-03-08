@@ -35,7 +35,7 @@ class ExpireGroupVersionsPlaceholder extends Base {
 	protected function configure() {
 		$this
 			->setName('templaterepo:expire')
-			->setDescription('Trigger expiry of versions for files stored in template repo');
+			->setDescription('Trigger expiry of versions for files stored in template_repo');
 		parent::configure();
 	}
 
