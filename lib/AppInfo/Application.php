@@ -305,14 +305,8 @@ class Application extends App implements IBootstrap {
 			});
 
 			// 註冊檔案上傳提醒
-			$this->getContainer()->getServer()->getNotificationManager()->registerNotifier(
-				function () {
-					return $this->getContainer()->query(Notifier::class);
-				},
-				function () {
-					return ['id' => 'templaterepo', 'name' => "templaterepo"];
-				}
-			);
+		     $manager = \OC::$server->getNotificationManager();
+		     $manager->registerNotifierService(Notifier::class);
 		});
 
 		\OCA\Files\App::getNavigationManager()->add([
