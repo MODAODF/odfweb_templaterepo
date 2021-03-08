@@ -39,8 +39,8 @@ class Version802000Date20201119112624 extends SimpleMigrationStep {
 
 		// There might be a duplicate column group which was already indexed through being primary key in Version401001Date20190715092137
 		$table = $schema->getTable('template_repo_manage');
-		if ($table->hasIndex('templates_repo_manage_unique')) {
-			$table->dropIndex('templates_repo_manage_unique');
+		if ($table->hasIndex('template_repo_manage_unique')) {
+			$table->dropIndex('template_repo_manage_unique');
 			$result = true;
 		}
 

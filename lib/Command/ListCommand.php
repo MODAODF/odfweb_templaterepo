@@ -54,7 +54,7 @@ class ListCommand extends Base {
 	protected function configure() {
 		$this
 			->setName('templaterepo:list')
-			->setDescription('List the configured template repo');
+			->setDescription('List the configured template_repo');
 		parent::configure();
 	}
 

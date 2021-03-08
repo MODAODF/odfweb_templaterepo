@@ -58,7 +58,7 @@ class Cleanup extends Base {
 
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		if (!$this->trashBackend) {
-			$output->writeln('<error>files_trashbin is disabled: template repo trashbin is not available</error>');
+			$output->writeln('<error>files_trashbin is disabled: template_repo trashbin is not available</error>');
 			return -1;
 		}
 		$helper = $this->getHelper('question');
@@ -82,7 +82,7 @@ class Cleanup extends Base {
 			$output->writeln('<error>Folder not found: ' . $folderId . '</error>');
 			return -1;
 		} else {
-			$question = new ConfirmationQuestion('Are you sure you want to empty the trashbin of your template repo, this can not be undone (y/N).', false);
+			$question = new ConfirmationQuestion('Are you sure you want to empty the trashbin of your template_repo, this can not be undone (y/N).', false);
 			if (!$input->getOption('force') && !$helper->ask($input, $output, $question)) {
 				return -1;
 			}
