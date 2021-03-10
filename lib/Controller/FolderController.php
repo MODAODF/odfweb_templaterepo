@@ -25,6 +25,7 @@ use OC\AppFramework\OCS\V1Response;
 use OCA\TemplateRepo\Folder\FolderManager;
 use OCA\TemplateRepo\Mount\MountProvider;
 use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\OCSController;
 use OCP\Files\IRootFolder;
 use OC\Files\Filesystem;
