@@ -64,7 +64,7 @@ class GroupVersionsExpireManager extends BasicEmitter {
 	 * @param array{id: int, mount_point: string, groups: array<empty, empty>|array<array-key, int>, quota: int, size: int, acl: bool} $folder
 	 */
 	public function expireFolder(array $folder): void {
-		$view = new View('/appdata__templaterepo/versions/' . $folder['id']);
+		$view = new View('/__templaterepo/versions/' . $folder['id']);
 		$files = $this->versionsBackend->getAllVersionedFiles($folder);
 		$dummyUser = new User('', null, $this->dispatcher);
 		foreach ($files as $fileId => $file) {
