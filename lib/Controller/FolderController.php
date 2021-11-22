@@ -33,12 +33,14 @@ use OC\Files\Node\Node;
 use OCP\IRequest;
 use OCP\IUserSession;
 use OCP\IUser;
+use OCP\IConfig;
 
 class FolderController extends OCSController {
 	private FolderManager $manager;
 	private MountProvider $mountProvider;
 	private IRootFolder $rootFolder;
 	private ?IUser $user = null;
+	private IConfig $config;
 
 	public function __construct(
 		string $AppName,
@@ -46,6 +48,7 @@ class FolderController extends OCSController {
 		FolderManager $manager,
 		MountProvider $mountProvider,
 		IRootFolder $rootFolder,
+		IConfig $config,
 		IUserSession $userSession
 	) {
 		parent::__construct($AppName, $request);
@@ -53,6 +56,7 @@ class FolderController extends OCSController {
 		$this->mountProvider = $mountProvider;
 		$this->rootFolder = $rootFolder;
 		$this->user = $userSession->getUser();
+		$this->config = $config;
 
 		$this->registerResponder('xml', function ($data): V1Response {
 			return $this->buildOCSResponseXML('xml', $data);
@@ -84,7 +88,9 @@ class FolderController extends OCSController {
 	 */
 	public function addFolder(string $mountpoint): DataResponse {
 		$id = $this->manager->createFolder($mountpoint);
-		return new DataResponse(['id' => $id]);
+		$apiserver = $this->config->getAppValue('richdocuments', 'wopi_url', '');
+		$this->manager->setAPIServer($id, $apiserver);
+		return new DataResponse(['id' => $id, 'apiserver' => $apiserver]);
 	}
 
 	/**
