@@ -1,6 +1,7 @@
 import {OCSResult} from "NC";
 import Thenable = JQuery.Thenable;
 import {FolderGroupsProps} from "./FolderGroups";
+import {FolderUsersProps} from "./FolderUsers";
 
 export interface Group {
 	id: string;

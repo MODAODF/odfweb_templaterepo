@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './FolderUsers.css';
+import './FolderUsers.scss';
 import { SyntheticEvent } from "react";
 import { Group, User } from "./Api";
 import Select from 'react-select'
@@ -117,7 +117,7 @@ function UserSelect({ allUsers, onChange }: UserSelectProps) {
 
 	return <Select
 		onChange={option => {
-			onChange && onChange(option.value)
+			onChange && option && onChange(option.value)
 		}}
 		options={options}
 		placeholder={t('templaterepo', 'Add user')}
