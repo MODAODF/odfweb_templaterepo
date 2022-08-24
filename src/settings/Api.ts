@@ -3,6 +3,7 @@ import Thenable = JQuery.Thenable;
 import {FolderGroupsProps} from "./FolderGroups";
 import axios from '@nextcloud/axios'
 import { generateUrl } from "@nextcloud/router";
+import {FolderUsersProps} from "./FolderUsers";
 
 export interface Group {
 	gid: string;
