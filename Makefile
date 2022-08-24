@@ -52,6 +52,7 @@ appstore: clean build/main.js
 	--exclude=/.scrutinizer.yml \
 	--exclude=/.travis.yml \
 	--exclude=/.tx \
+	--exclude=/build \
 	--exclude=/CONTRIBUTING.md \
 	--exclude=/Makefile \
 	--exclude=/README.md \
