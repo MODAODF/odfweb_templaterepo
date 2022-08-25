@@ -49,6 +49,7 @@ class FolderController extends OCSController {
 
 	public function __construct(
 		string $AppName,
+		string $userId,
 		IRequest $request,
 		FolderManager $manager,
 		MountProvider $mountProvider,
@@ -65,6 +66,7 @@ class FolderController extends OCSController {
 		$this->rootFolder = $rootFolder;
 		$this->user = $userSession->getUser();
 		$this->config = $config;
+		$this->userId = $userId;
 
 		$this->registerResponder('xml', function ($data): V1Response {
 			return $this->buildOCSResponseXML('xml', $data);
