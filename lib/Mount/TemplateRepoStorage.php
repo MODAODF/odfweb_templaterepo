@@ -30,7 +30,7 @@ use OCP\Files\Storage\IDisableEncryptionStorage;
 use OCP\IUser;
 use OCP\IUserSession;
 
-class TemplateRepoStorage extends Quota implements IDisableEncryptionStorage {
+class TemplateRepoStorage extends Quota {
 	private int $folderId;
 	private ICacheEntry $rootEntry;
 	private IUserSession $userSession;
