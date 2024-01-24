@@ -91,7 +91,7 @@ class AdminGroupSelect extends Component<AdminGroupSelectProps> {
 			})}
 			className="delegated-admins-select"
 			options={options}
-			placeholder={t('groupfolders', 'Add group')}
+			placeholder={t('templaterepo', 'Add group')}
 			styles={{
 				input: (provided) => ({
 					...provided,

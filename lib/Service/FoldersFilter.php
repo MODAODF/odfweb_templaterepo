@@ -3,7 +3,7 @@
 /**
  * @author Baptiste Fotia <baptiste.fotia@hotmail.com> for Arawa (https://arawa.fr)
  *
- * GroupFolders
+ * TemplateRepo
  *
  * This code is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,7 +19,7 @@
  *
  */
 
-namespace OCA\GroupFolders\Service;
+namespace OCA\TemplateRepo\Service;
 
 use OCP\IUserSession;
 use OCP\IGroupManager;

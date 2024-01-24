@@ -21,9 +21,9 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\GroupFolders\Mount;
+namespace OCA\TemplateRepo\Mount;
 
 use OCP\Files\Storage\IDisableEncryptionStorage;
 
-class GroupFolderNoEncryptionStorage extends GroupFolderStorage implements IDisableEncryptionStorage {
+class TemplateRepoNoEncryptionStorage extends TemplateRepoStorage implements IDisableEncryptionStorage {
 }

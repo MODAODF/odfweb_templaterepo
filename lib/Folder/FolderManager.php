@@ -161,10 +161,10 @@ class FolderManager {
 		$query = $this->connection->getQueryBuilder();
 
 		$query->select('f.folder_id', 'mount_point', 'quota', 'size', 'acl')
-			->from('group_folders', 'f')
+			->from('template_repo', 'f')
 			->innerJoin(
 				'f',
-				'group_folders_groups',
+				'template_repo_groups',
 				'a',
 				$query->expr()->eq('f.folder_id', 'a.folder_id')
 			)
@@ -778,13 +778,13 @@ class FolderManager {
 		$query->executeStatement();
 
 		$query = $this->connection->getQueryBuilder();
-		$query->delete('group_folders_manage')
+		$query->delete('template_repo_manage')
 			->where($query->expr()->eq('mapping_id', $query->createNamedParameter($groupId)))
 			->andWhere($query->expr()->eq('mapping_type', $query->createNamedParameter('group')));
 		$query->executeStatement();
 
 		$query = $this->connection->getQueryBuilder();
-		$query->delete('group_folders_acl')
+		$query->delete('template_repo_acl')
 			->where($query->expr()->eq('mapping_id', $query->createNamedParameter($groupId)))
 			->andWhere($query->expr()->eq('mapping_type', $query->createNamedParameter('group')));
 		$query->executeStatement();

@@ -23,7 +23,7 @@ namespace OCA\TemplateRepo\Mount;
 
 use OC\Files\Storage\Wrapper\Jail;
 use OC\Files\Storage\Wrapper\PermissionsMask;
-use OCA\GroupFolders\ACL\ACLManager;
+use OCA\TemplateRepo\ACL\ACLManager;
 use OCA\TemplateRepo\ACL\ACLManagerFactory;
 use OCA\TemplateRepo\ACL\ACLStorageWrapper;
 use OCA\TemplateRepo\Folder\FolderManager;
@@ -244,7 +244,7 @@ class MountProvider implements IMountProvider {
 				'mountOwner' => $user,
 			]);
 		} else {
-			$quotaStorage = new GroupFolderNoEncryptionStorage([
+			$quotaStorage = new TemplateRepoNoEncryptionStorage([
 				'storage' => $baseStorage,
 				'quota' => $quota,
 				'folder_id' => $id,

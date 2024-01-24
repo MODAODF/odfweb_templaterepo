@@ -59,7 +59,7 @@ class ListCommand extends Base {
 		$this
 			->setName('templaterepo:list')
 			->setDescription('List the configured template_repo')
-			->addOption('user', 'u', InputArgument::OPTIONAL, "List group folders applicable for a user");
+			->addOption('user', 'u', InputArgument::OPTIONAL, "List template repo applicable for a user");
 		parent::configure();
 	}
 

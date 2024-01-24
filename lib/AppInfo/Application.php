@@ -28,7 +28,7 @@ use OCA\TemplateRepo\ACL\ACLManagerFactory;
 use OCA\TemplateRepo\ACL\RuleManager;
 use OCA\TemplateRepo\ACL\UserMapping\IUserMappingManager;
 use OCA\TemplateRepo\ACL\UserMapping\UserMappingManager;
-use OCA\GroupFolders\AuthorizedAdminSettingMiddleware;
+use OCA\TemplateRepo\AuthorizedAdminSettingMiddleware;
 use OCA\TemplateRepo\BackgroundJob\ExpireGroupPlaceholder;
 use OCA\TemplateRepo\BackgroundJob\ExpireGroupTrash as ExpireGroupTrashJob;
 use OCA\TemplateRepo\BackgroundJob\ExpireGroupVersions as ExpireGroupVersionsJob;
@@ -78,7 +78,7 @@ class Application extends App implements IBootstrap {
 		parent::__construct('templaterepo', $urlParams);
 	}
 
-	public const APPS_USE_GROUPFOLDERS = [
+	public const APPS_USE_TEMPLATEREPO = [
 		'workspace'
 	];
 
@@ -94,7 +94,7 @@ class Application extends App implements IBootstrap {
 			};
 			$config = $c->get(IConfig::class);
 			$allowRootShare = $config->getAppValue('templaterepo', 'allow_root_share', 'true') === 'true';
-			$enableEncryption = $config->getAppValue('groupfolders', 'enable_encryption', 'false') === 'true';
+			$enableEncryption = $config->getAppValue('templaterepo', 'enable_encryption', 'false') === 'true';
 
 			return new MountProvider(
 				$c->getServer()->getGroupManager(),

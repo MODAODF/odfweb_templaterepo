@@ -3,7 +3,7 @@
 /**
  * @author Cyrille Bollu <cyr.debian@bollu.be> for Arawa (https://arawa.fr)
  *
- * GroupFolders
+ * TemplateRepo
  *
  * This code is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,22 +19,22 @@
  *
  */
 
-namespace OCA\GroupFolders\Service;
+namespace OCA\TemplateRepo\Service;
 
 use OC\Settings\AuthorizedGroupMapper;
-use OCA\GroupFolders\Controller\DelegationController;
-use OCA\GroupFolders\Settings\Admin;
+use OCA\TemplateRepo\Controller\DelegationController;
+use OCA\TemplateRepo\Settings\Admin;
 use OCP\IGroupManager;
 use OCP\IUserSession;
 
 class DelegationService {
 	/**
-	 * Has access to the entire groupfolders
+	 * Has access to the entire templaterepo
 	 */
 	private const CLASS_NAME_ADMIN_DELEGATION = Admin::class;
 
 	/**
-	 * Has access only to the groupfolders in which the user has advanced
+	 * Has access only to the templaterepo in which the user has advanced
 	 * permissions.
 	 */
 	private const CLASS_API_ACCESS = DelegationController::class;

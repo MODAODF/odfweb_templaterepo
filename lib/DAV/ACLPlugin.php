@@ -46,7 +46,7 @@ class ACLPlugin extends ServerPlugin {
 	public const ACL_CAN_MANAGE = '{http://nextcloud.org/ns}acl-can-manage';
 	public const ACL_LIST = '{http://nextcloud.org/ns}acl-list';
 	public const INHERITED_ACL_LIST = '{http://nextcloud.org/ns}inherited-acl-list';
-	public const GROUP_FOLDER_ID = '{http://nextcloud.org/ns}template-repo-id';
+	public const TEMPLATE_REPO_ID = '{http://nextcloud.org/ns}template-repo-id';
 
 	private ?Server $server = null;
 	private RuleManager $ruleManager;
@@ -167,7 +167,7 @@ class ACLPlugin extends ServerPlugin {
 			}, $mappings, $inheritedPermissionsByMapping);
 		});
 
-		$propFind->handle(self::GROUP_FOLDER_ID, function () use ($fileInfo) {
+		$propFind->handle(self::TEMPLATE_REPO_ID, function () use ($fileInfo) {
 			return $this->folderManager->getFolderByPath($fileInfo->getPath());
 		});
 

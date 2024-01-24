@@ -21,12 +21,12 @@
   -->
 <template>
 	<div v-if="readOnly">
-		<NcButton v-if="!isAllowed" v-tooltip="t('templaterepo', 'Denied')" :title="t('groupfolders', 'Denied')" :aria-label="t('groupfolders', 'Access denied')">
+		<NcButton v-if="!isAllowed" v-tooltip="t('templaterepo', 'Denied')" :title="t('templaterepo', 'Denied')" :aria-label="t('templaterepo', 'Access denied')">
 			<template #icon>
 				<Cancel :size="16" />
 			</template>
 		</NcButton>
-		<NcButton v-else v-tooltip="t('templaterepo', 'Allowed')" :title="t('groupfolders', 'Allowed')" :aria-label="t('groupfolders', 'Access allowed')">
+		<NcButton v-else v-tooltip="t('templaterepo', 'Allowed')" :title="t('templaterepo', 'Allowed')" :aria-label="t('templaterepo', 'Access allowed')">
 			<template #icon>
 				<Check :size="16" />
 			</template>
@@ -41,19 +41,19 @@
 				:checked="state === STATES.INHERIT_ALLOW || state === STATES.INHERIT_DENY"
 				:disabled="disabled"
 				@change="$emit('update', STATES.INHERIT_ALLOW)">
-				{{ t('groupfolders', 'Inherit permission') }}
+				{{ t('templaterepo', 'Inherit permission') }}
 			</NcActionRadio>
 			<NcActionRadio name="state"
 				:check="state === STATES.SELF_DENY"
 				:disabled="disabled"
 				@change="$emit('update', STATES.SELF_DENY)">
-				{{ t('groupfolders', 'Deny') }}
+				{{ t('templaterepo', 'Deny') }}
 			</NcActionRadio>
 			<NcActionRadio name="state"
 				:check="state === STATES.SELF_ALLOW"
 				:disabled="disabled"
 				@change="$emit('update', STATES.SELF_ALLOW)">
-				{{ t('groupfolders', 'Allow') }}
+				{{ t('templaterepo', 'Allow') }}
 			</NcActionRadio>
 		</NcActions>
 	</div>
@@ -127,13 +127,13 @@ export default {
 		label() {
 			switch (this.state) {
 			case STATES.INHERIT_DENY:
-				return t('groupfolders', 'Denied (Inherited permission)')
+				return t('templaterepo', 'Denied (Inherited permission)')
 			case STATES.INHERIT_ALLOW:
-				return t('groupfolders', 'Allowed (Inherited permission)')
+				return t('templaterepo', 'Allowed (Inherited permission)')
 			case STATES.SELF_DENY:
-				return t('groupfolders', 'Denied')
+				return t('templaterepo', 'Denied')
 			case STATES.SELF_ALLOW:
-				return t('groupfolders', 'Allowed')
+				return t('templaterepo', 'Allowed')
 			}
 			return ''
 		},

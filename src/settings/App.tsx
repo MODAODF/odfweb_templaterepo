@@ -73,8 +73,8 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 			this.setState({groups});
 		});
 
-		this.setState({ isAdminNextcloud: loadState('groupfolders', 'isAdminNextcloud') });
-		this.setState({ checkAppsInstalled: loadState('groupfolders', 'checkAppsInstalled') });
+		this.setState({ isAdminNextcloud: loadState('templaterepo', 'isAdminNextcloud') });
+		this.setState({ checkAppsInstalled: loadState('templaterepo', 'checkAppsInstalled') });
 
 		this.api.listUsers().then((users) => {
 			this.setState({users});
@@ -215,17 +215,17 @@ export class App extends Component<{}, AppState> implements OC.Plugin<OC.Search.
 
 	showAdminDelegationForms() {
 		if (this.state.isAdminNextcloud && this.state.checkAppsInstalled) {
-			return <div id="groupfolders-admin-delegation">
-				<h3>{ t('groupfolders', 'Group folder admin delegation') }</h3>
-				<p><em>{ t('groupfolders', 'Nextcloud allows you to delegate the administration of group folders to non-admin users.') }</em></p>
-				<p><em>{ t('groupfolders', 'Specify below the groups that will be allowed to manage group folders and use its API/REST.') }</em></p>
-				<p className="end-description-delegation"><em>{ t('groupfolders', 'They will have access to all Groupfolders.') }</em></p>
+			return <div id="templaterepo-admin-delegation">
+				<h3>{ t('templaterepo', 'template repo admin delegation') }</h3>
+				<p><em>{ t('templaterepo', 'Nextcloud allows you to delegate the administration of template repo to non-admin users.') }</em></p>
+				<p><em>{ t('templaterepo', 'Specify below the groups that will be allowed to manage template repo and use its API/REST.') }</em></p>
+				<p className="end-description-delegation"><em>{ t('templaterepo', 'They will have access to all Templaterepo.') }</em></p>
 				<AdminGroupSelect
 					groups={this.state.groups}
 					allGroups={this.state.groups}
 					delegatedAdminGroups={this.state.delegatedAdminGroups} />
-				<p><em>{ t('groupfolders', 'Specify below the groups that will be allowed to manage group folders and use its API/REST only.') }</em></p>
-				<p className="end-description-delegation"><em>{ t('groupfolders', 'They will only have access to group folders for which they have advanced permissions.') }</em></p>
+				<p><em>{ t('templaterepo', 'Specify below the groups that will be allowed to manage template repo and use its API/REST only.') }</em></p>
+				<p className="end-description-delegation"><em>{ t('templaterepo', 'They will only have access to template repo for which they have advanced permissions.') }</em></p>
 				<SubAdminGroupSelect
 					groups={this.state.groups}
 					allGroups={this.state.groups}

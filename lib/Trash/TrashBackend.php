@@ -438,7 +438,7 @@ class TrashBackend implements ITrashBackend {
 	}
 
 	/**
-	 * Cleanup trashbin of of groupfolders that have been deleted
+	 * Cleanup trashbin of of templaterepo that have been deleted
 	 *
 	 * @param array $existingFolders
 	 * @return void

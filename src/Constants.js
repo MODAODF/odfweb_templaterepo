@@ -19,5 +19,5 @@
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-export const CLASS_NAME_ADMIN_DELEGATION = 'OCA\\GroupFolders\\Settings\\Admin'
-export const CLASS_NAME_SUBADMIN_DELEGATION = 'OCA\\GroupFolders\\Controller\\DelegationController'
+export const CLASS_NAME_ADMIN_DELEGATION = 'OCA\\TemplateRepo\\Settings\\Admin'
+export const CLASS_NAME_SUBADMIN_DELEGATION = 'OCA\\TemplateRepo\\Controller\\DelegationController'

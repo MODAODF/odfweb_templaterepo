@@ -3,7 +3,7 @@
 /**
  * @author Cyrille Bollu <cyr.debian@bollu.be> for Arawa (https://www.arawa.fr/)
  *
- * GroupFolders
+ * TemplateRepo
  *
  * This code is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License, version 3,
@@ -19,10 +19,10 @@
  *
  */
 
-namespace OCA\GroupFolders;
+namespace OCA\TemplateRepo;
 
 use Exception;
-use OCA\GroupFolders\Service\DelegationService;
+use OCA\TemplateRepo\Service\DelegationService;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -54,7 +54,7 @@ class AuthorizedAdminSettingMiddleware extends Middleware {
 	 *
 	 */
 	public function beforeController($controller, $methodName) {
-		if ($this->reflector->hasAnnotation('RequireGroupFolderAdmin')) {
+		if ($this->reflector->hasAnnotation('RequireTemplateRepoAdmin')) {
 			if (!$this->delegatedService->hasApiAccess()) {
 				throw new Exception('Logged in user must be an admin, a sub admin or gotten special right to access this setting');
 			}

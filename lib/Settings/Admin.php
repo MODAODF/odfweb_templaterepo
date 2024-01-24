@@ -21,8 +21,8 @@
 
 namespace OCA\TemplateRepo\Settings;
 
-use OCA\GroupFolders\Service\ApplicationService;
-use OCA\GroupFolders\Service\DelegationService;
+use OCA\TemplateRepo\Service\ApplicationService;
+use OCA\TemplateRepo\Service\DelegationService;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Settings\IDelegatedSettings;
 use OCP\AppFramework\Services\IInitialState;
