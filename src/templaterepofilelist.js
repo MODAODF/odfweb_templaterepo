@@ -9,7 +9,7 @@
  */
 
 // HACK: this piece needs to be loaded AFTER the files app (for unit tests)
-$(document).ready(function () {
+window.addEventListener('DOMContentLoaded', function () {
 	(function (OCA) {
 		/**
 		 * @class OCA.Files.TemplateRepoFileList
@@ -18,7 +18,7 @@ $(document).ready(function () {
 		 * @classdesc TemplateRepo file list.
 		 * Displays the list of files marked as favorites
 		 *
-		 * @param $el container element with existing markup for the #controls
+		 * @param $el container element with existing markup for the .files-controls
 		 * and a table
 		 * @param [options] map of options, see other parameters
 		 */
@@ -56,9 +56,9 @@ $(document).ready(function () {
 						var dir = this.getCurrentDirectory();
 						if (dir === '/') {
 							// root has special permissions
-							this.$el.find('#emptycontent').toggleClass('hidden', !this.isEmpty);
-							this.$el.find('#filestable thead th').toggleClass('hidden', this.isEmpty);
-							this.$el.find('#emptycontent').html('<div class="nav-icon-templaterepo"></div>' +
+							this.$el.find('.emptyfilelist.emptycontent').toggleClass('hidden', !this.isEmpty);
+							this.$el.find('.files-filestable thead th').toggleClass('hidden', this.isEmpty);
+							this.$el.find('.emptyfilelist.emptycontent').html('<div class="icon-folder"></div>' +
 								'<h2>' + t('templaterepo', 'No Template Repo') + '</h2>');
 						}
 						else {
@@ -77,7 +77,7 @@ $(document).ready(function () {
 
 					reload: function () {
 						this.showMask();
-						if (this._reloadCall) {
+						if (this._reloadCall?.abort) {
 							this._reloadCall.abort();
 						}
 
