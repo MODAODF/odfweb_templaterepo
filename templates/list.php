@@ -8,7 +8,7 @@
 	<p></p>
 </div>
 
-<table class="files-filestable list-container <?php p($_['showgridview'] ? 'view-grid' : '') ?>">
+<table class="files-filestable list-container templaterepo_filelist <?php p($_['showgridview'] ? 'view-grid' : '') ?>">
 	<thead>
 	<tr>
 		<th class="hidden column-name">
