@@ -1,0 +1,9 @@
+.nav-icon-templaterepolist {
+  background-image: url("../img/app-icon.svg");
+}
+
+.templaterepo_filelist {
+  display: flex !important;
+}
+
+/*# sourceMappingURL=merged.css.map */
