@@ -81,8 +81,8 @@
 			var fileActions = new OCA.Files.FileActions();
 			// note: not merging the legacy actions because legacy apps are not
 			// compatible with the sharing overview and need to be adapted first
-			fileActions.registerDefaultActions();
-			fileActions.merge(OCA.Files.fileActions);
+			templateRepoFileActions = this._templateRepoFileListActions(fileActions);
+			templateRepoFileActions.merge(OCA.Files.fileActions);
 
 			if (!this._globalActionsInitialized) {
 				// in case actions are registered later
@@ -110,6 +110,61 @@
 					ev.defaultAction.name
 				);
 			}
+		},
+
+		_templateRepoFileListActions(fileActions) {
+			fileActions.registerAction({
+				name: 'MoveCopy',
+				displayName: t('files', 'Copy'),
+				mime: 'all',
+				order: -25,
+				permissions: OC.PERMISSION_READ,
+				iconClass: 'icon-external',
+				actionHandler: function (filename, context) {
+					var actions = OC.dialogs.FILEPICKER_TYPE_COPY;
+					var dialogDir = context.dir;
+					if (typeof context.fileList.dirInfo.dirLastCopiedTo !== 'undefined') {
+						dialogDir = context.fileList.dirInfo.dirLastCopiedTo;
+					}
+					OC.dialogs.filepicker(t('files', 'Choose target folder'), function(targetPath, type) {
+						if (type === OC.dialogs.FILEPICKER_TYPE_COPY) {
+							context.fileList.copy(filename, targetPath, false, context.dir);
+						}
+							context.fileList.dirInfo.dirLastCopiedTo = targetPath;
+						}, false, "httpd/unix-directory", true, actions, dialogDir);
+				}
+			});
+
+			fileActions.registerAction({
+				name: 'Download',
+				displayName: t('files', 'Download'),
+				order: -20,
+				mime: 'all',
+				permissions: OC.PERMISSION_READ,
+				iconClass: 'icon-download',
+				actionHandler: function (filename, context) {
+					var dir = context.dir || context.fileList.getCurrentDirectory();
+					var isDir = context.$file.attr('data-type') === 'dir';
+					var url = context.fileList.getDownloadUrl(filename, dir, isDir);
+
+					var downloadFileaction = $(context.$file).find('.fileactions .action-download');
+
+					// don't allow a second click on the download action
+					if(downloadFileaction.hasClass('disabled')) {
+						return;
+					}
+
+					if (url) {
+						var disableLoadingState = function() {
+							context.fileList.showFileBusyState(filename, false);
+						};
+
+						context.fileList.showFileBusyState(filename, true);
+						OCA.Files.Files.handleDownload(url, disableLoadingState);
+					}
+				}
+			});
+			return fileActions;
 		}
 	};
 
