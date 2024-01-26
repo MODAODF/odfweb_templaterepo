@@ -3,5 +3,5 @@ node_modules/
 *.log
 build
 vendor
-js/
+# js/
 .vscode
